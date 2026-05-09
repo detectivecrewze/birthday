@@ -15,15 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Check for ?to= parameter → load from Worker
   const params = new URLSearchParams(window.location.search);
-  let giftId = params.get('to');
-
-  // Fallback to path segment if no query param (for clean URLs on Vercel)
-  if (!giftId) {
-    const path = window.location.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
-    if (path.length === 1 && path[0] !== 'index.html' && path[0] !== 'studio' && path[0] !== 'admin') {
-      giftId = path[0];
-    }
-  }
+  const giftId = params.get('to');
   let cfg = window.BIRTHDAY_CONFIG || {};
 
   if (giftId) {
