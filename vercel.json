@@ -3,7 +3,7 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/studio/:token",
+      "source": "/studio/:path+",
       "destination": "/studio/index.html"
     },
     {
