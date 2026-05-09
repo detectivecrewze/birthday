@@ -1,4 +1,14 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/studio/:token",
+      "destination": "/studio/index.html?token=:token"
+    },
+    {
+      "source": "/:to",
+      "destination": "/index.html?to=:to"
+    }
+  ]
 }
