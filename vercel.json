@@ -4,11 +4,11 @@
   "rewrites": [
     {
       "source": "/studio/:token",
-      "destination": "/studio/index.html?token=:token"
+      "destination": "/studio/index.html"
     },
     {
       "source": "/:to",
-      "destination": "/index.html?to=:to"
+      "destination": "/index.html"
     }
   ]
 }
