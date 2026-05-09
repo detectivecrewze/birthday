@@ -3,11 +3,11 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/studio/:path+",
+      "source": "/studio/:token([^.]+)",
       "destination": "/studio/index.html"
     },
     {
-      "source": "/:to",
+      "source": "/:to([^.]+)",
       "destination": "/index.html"
     }
   ]
