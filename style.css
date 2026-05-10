@@ -712,4 +712,13 @@ body {
   text-shadow: 1px 1px 0 #000;
 }
 
+/* Fix close button on secret memory modal for mobile */
+#btn-close-memory {
+  pointer-events: auto !important;
+  cursor: pointer;
+  padding: 8px;
+  margin: -8px;
+  font-size: 1.1rem;
+}
+
 
