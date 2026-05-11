@@ -660,6 +660,63 @@ body {
   flex: 1;
 }
 
+/* Volume control row */
+.cdplayer-volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  background: var(--gray);
+  box-shadow: var(--sink);
+  padding: 6px 8px;
+}
+.vol-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.vol-icon:active { transform: scale(0.88); }
+.vol-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: #fff;
+  box-shadow: var(--sink);
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 20px;
+  background: var(--gray);
+  box-shadow: var(--raise);
+  cursor: pointer;
+}
+.vol-slider::-moz-range-thumb {
+  width: 14px;
+  height: 20px;
+  background: var(--gray);
+  box-shadow: var(--raise);
+  border: none;
+  cursor: pointer;
+  border-radius: 0;
+}
+.vol-pct {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--black);
+  min-width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
 .cdplayer-info {
   background: var(--white);
   box-shadow: var(--sink);

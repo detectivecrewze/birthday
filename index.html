@@ -130,11 +130,17 @@
         </div>
 
         <div class="cdplayer-controls">
-          <button class="win-btn cd-btn" id="cd-play" title="Play">▶</button>
-          <button class="win-btn cd-btn" id="cd-pause" title="Pause">⏸</button>
-          <button class="win-btn cd-btn" id="cd-stop" title="Stop">⏹</button>
           <button class="win-btn cd-btn" id="cd-prev" title="Prev">⏮</button>
+          <button class="win-btn cd-btn" id="cd-toggle" title="Play/Pause">▶</button>
           <button class="win-btn cd-btn" id="cd-next" title="Next">⏭</button>
+          <button class="win-btn cd-btn" id="cd-stop" title="Stop">⏹</button>
+          <button class="win-btn cd-btn" id="cd-loop" title="Loop">🔁</button>
+        </div>
+
+        <div class="cdplayer-volume">
+          <span class="vol-icon" id="cd-vol-icon">🔊</span>
+          <input type="range" id="cd-volume" class="vol-slider" min="0" max="100" value="80" aria-label="Volume">
+          <span class="vol-pct" id="cd-vol-pct">80%</span>
         </div>
 
         <div class="cdplayer-info">

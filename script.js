@@ -48,10 +48,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const skipAuth = params.get('skipAuth') === '1';
   const openMemory = params.get('openMemory') === '1';
 
-  function initLoginStage(cfg) {
+  function initLoginStage(cfg, noPassword = false) {
     goToStage('stage-login');
     const hintText = document.getElementById('login-hint-text');
-    if (cfg.giftHint && cfg.giftHint.trim() !== '') {
+    if (!noPassword && cfg.giftHint && cfg.giftHint.trim() !== '') {
       hintText.textContent = `Hint: ${cfg.giftHint}`;
       hintText.style.display = 'block';
     } else {
@@ -66,11 +66,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const dialogSuccess = document.getElementById('login-dialog-success');
     const btnSuccessOk = document.getElementById('btn-login-success-ok');
 
+    // Adapt UI for "No Password" mode (Welcome screen)
+    if (noPassword) {
+      const titleText = dialogMain.querySelector('.win-titlebar-text');
+      const bodyText = dialogMain.querySelector('.win-body p');
+      if (titleText) titleText.textContent = '👋 Welcome';
+      if (bodyText) bodyText.textContent = 'Klik OK untuk membuka kado spesialmu! 🎁';
+      if (input) input.style.display = 'none';
+      if (hintText) hintText.style.display = 'none';
+    }
+
     function checkPassword() {
-      if (input.value === cfg.giftPassword) {
+      if (noPassword || input.value === cfg.giftPassword) {
         errorMsg.style.display = 'none';
         dialogMain.style.display = 'none';
-        dialogSuccess.style.display = 'block';
+        if (noPassword) {
+          // Skip success dialog if no password, go straight to stage 1
+          goToStage('stage-1');
+          initStage1(cfg);
+        } else {
+          dialogSuccess.style.display = 'block';
+        }
       } else {
         errorMsg.style.display = 'block';
         input.value = '';
@@ -88,13 +104,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       initStage1(cfg);
     });
 
-    input.focus();
+    if (!noPassword) input.focus();
   }
 
   // ?skipAuth=1 → skip login gate (studio preview mode)
   const hasPassword = cfg.giftPassword && cfg.giftPassword.trim().length > 0;
-  if (hasPassword && !skipAuth) {
-    initLoginStage(cfg);
+  if (!skipAuth) {
+    initLoginStage(cfg, !hasPassword);
   } else if (openMemory) {
     // ?openMemory=1 → jump straight to stage-5, then auto-open secret modal
     goToStage('stage-5');
@@ -152,7 +168,37 @@ function goToStage(id) {
 /* ═══════════════════════════════════════════════
    TYPING ENGINE
 ═══════════════════════════════════════════════ */
-function typeText(elementId, text, speed = 65) {
+let typeAudioCtx;
+function playTypingSound() {
+  try {
+    if (!typeAudioCtx) {
+      typeAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (typeAudioCtx.state === 'suspended') {
+      typeAudioCtx.resume().catch(() => {});
+    }
+    
+    const osc = typeAudioCtx.createOscillator();
+    const gainNode = typeAudioCtx.createGain();
+    
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(150, typeAudioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, typeAudioCtx.currentTime + 0.05);
+    
+    gainNode.gain.setValueAtTime(0.1, typeAudioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, typeAudioCtx.currentTime + 0.05);
+    
+    osc.connect(gainNode);
+    gainNode.connect(typeAudioCtx.destination);
+    
+    osc.start();
+    osc.stop(typeAudioCtx.currentTime + 0.05);
+  } catch (e) {
+    console.warn("Typing sound failed:", e);
+  }
+}
+
+function typeText(elementId, text, speed = 65, playAudio = false) {
   return new Promise(resolve => {
     const el = document.getElementById(elementId);
     if (!el) return resolve();
@@ -172,6 +218,7 @@ function typeText(elementId, text, speed = 65) {
           el.insertBefore(document.createElement('br'), cursor);
         } else {
           el.insertBefore(document.createTextNode(char), cursor);
+          if (playAudio && char !== ' ') playTypingSound();
         }
         i++;
         setTimeout(type, speed);
@@ -195,8 +242,8 @@ async function initStage1(cfg) {
   const btn = document.getElementById('btn-next-1');
   const charEl = document.getElementById('stage1-char');
 
-  // Start typing
-  await typeText('stage1-text', heading, 80);
+  // Start typing with audio
+  await typeText('stage1-text', heading, 80, true);
 
   // Show character
   if (charEl) {
@@ -215,7 +262,7 @@ async function initStage1(cfg) {
 ═══════════════════════════════════════════════ */
 async function initStage2(cfg) {
   const question = cfg.stage2_question || 'i have a surprise for\nyou, wanna see it?';
-  await typeText('stage2-text', question, 55);
+  await typeText('stage2-text', question, 55, true);
 }
 
 /* ═══════════════════════════════════════════════
@@ -295,7 +342,7 @@ async function initStage4(cfg) {
 ═══════════════════════════════════════════════ */
 async function initStage5(cfg) {
   const wishes = cfg.stage5_wishes || 'Happy birthday! 🎂\n\nWith love ♡';
-  await typeText('stage5-message', wishes, 25);
+  await typeText('stage5-message', wishes, 50, true);
 
   // Update line/col counter
   const lines = wishes.split('\n').length;
@@ -519,6 +566,48 @@ function initCDPlayer(cfg) {
   const titleEl = document.getElementById('cd-title');
   const discIcon = document.querySelector('.spinning-cd');
 
+  // Volume control
+  const volSlider = document.getElementById('cd-volume');
+  const volPct    = document.getElementById('cd-vol-pct');
+  const volIcon   = document.getElementById('cd-vol-icon');
+  let lastVol = 0.8;
+
+  // Set initial audio volume
+  audio.volume = 0.8;
+
+  function updateVolUI(val) {
+    const pct = Math.round(val * 100);
+    if (volPct) volPct.textContent = pct + '%';
+    if (volIcon) {
+      if (val === 0)       volIcon.textContent = '🔇';
+      else if (val < 0.4)  volIcon.textContent = '🔉';
+      else                 volIcon.textContent = '🔊';
+    }
+  }
+
+  volSlider?.addEventListener('input', () => {
+    const val = volSlider.value / 100;
+    audio.volume = val;
+    audio.muted = (val === 0);
+    lastVol = val > 0 ? val : lastVol;
+    updateVolUI(val);
+  });
+
+  // Click icon to toggle mute
+  volIcon?.addEventListener('click', () => {
+    if (audio.muted || audio.volume === 0) {
+      audio.muted = false;
+      audio.volume = lastVol || 0.8;
+      if (volSlider) volSlider.value = Math.round((lastVol || 0.8) * 100);
+      updateVolUI(audio.volume);
+    } else {
+      lastVol = audio.volume;
+      audio.muted = true;
+      if (volSlider) volSlider.value = 0;
+      updateVolUI(0);
+    }
+  });
+
   function playTrack(idx) {
     const t = playlist[idx];
     if (!t) return;
@@ -543,10 +632,14 @@ function initCDPlayer(cfg) {
 
   audio.addEventListener('play', () => {
     getDiscIcon()?.classList.remove('paused');
+    const toggleBtn = document.getElementById('cd-toggle');
+    if (toggleBtn) toggleBtn.textContent = '⏸';
   });
   
   audio.addEventListener('pause', () => {
     getDiscIcon()?.classList.add('paused');
+    const toggleBtn = document.getElementById('cd-toggle');
+    if (toggleBtn) toggleBtn.textContent = '▶';
   });
   
   audio.addEventListener('timeupdate', () => {
@@ -561,21 +654,24 @@ function initCDPlayer(cfg) {
     playTrack(currentIdx);
   });
 
-  document.getElementById('cd-play')?.addEventListener('click', () => {
-    const icon = getDiscIcon();
-    if (!audio.src || audio.src === window.location.href) {
-      playTrack(currentIdx);
-    } else {
-      audio.play().catch(e => {
-        console.error("Play failed:", e);
-        // If play fails, maybe try to reload the track as fallback
+  document.getElementById('cd-toggle')?.addEventListener('click', () => {
+    if (audio.paused) {
+      if (!audio.src || audio.src === window.location.href) {
         playTrack(currentIdx);
-      });
+      } else {
+        audio.play().catch(e => {
+          console.error("Play failed:", e);
+          playTrack(currentIdx);
+        });
+      }
+    } else {
+      audio.pause();
     }
   });
 
-  document.getElementById('cd-pause')?.addEventListener('click', () => {
-    audio.pause();
+  document.getElementById('cd-loop')?.addEventListener('click', (e) => {
+    audio.loop = !audio.loop;
+    e.currentTarget.style.boxShadow = audio.loop ? 'var(--sink)' : 'var(--raise)';
   });
 
   document.getElementById('cd-stop')?.addEventListener('click', () => {
