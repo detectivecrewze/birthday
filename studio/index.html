@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎂 Birthday Studio — Windows 98 Edition</title>
+  <title>🎁 Retro Gift Studio — Windows 98 Edition</title>
   <link rel="icon" type="image/png" href="/assets/favicon/favicon-96x96.png" sizes="96x96">
   <link rel="icon" type="image/svg+xml" href="/assets/favicon/favicon.svg">
   <link rel="shortcut icon" href="/assets/favicon/favicon.ico">
@@ -59,7 +59,7 @@
     <div class="studio-taskbar">
       <span>🪟 <strong>Start</strong></span>
       <div class="taskbar-sep"></div>
-      <span class="taskbar-active">🎂 Birthday Studio</span>
+      <span class="taskbar-active">🎁 Retro Gift Studio</span>
       <span id="save-status" class="save-status" style="opacity:0;"></span>
       <span id="premium-badge" class="premium-badge">Free</span>
     </div>
@@ -67,14 +67,40 @@
     <!-- Window frame -->
     <div class="studio-window">
       <div class="win-titlebar">
-        <span class="win-title-text">📝 Birthday Card Editor — Studio</span>
+        <span class="win-title-text">📝 Retro Gift Editor — Studio</span>
         <span class="win-controls">─ □ ✕</span>
       </div>
       <div class="win-menubar">File&ensp; Edit&ensp; Tools&ensp; Help</div>
 
       <div class="studio-content">
 
-        <!-- ── Section 0: Tema & Background (Premium) ── -->
+        <!-- ── Section 0: Template Selector ── -->
+        <fieldset class="studio-section">
+          <legend>🪟 Template</legend>
+          <div class="template-selector" id="template-selector">
+            <label class="template-card selected" data-template="birthday">
+              <input type="radio" name="template" value="birthday" checked>
+              <span class="template-icon">🎂</span>
+              <span class="template-name">Birthday</span>
+              <span class="template-desc">Ulang tahun</span>
+            </label>
+            <label class="template-card" data-template="apology">
+              <input type="radio" name="template" value="apology">
+              <span class="template-icon">💌</span>
+              <span class="template-name">Apology</span>
+              <span class="template-desc">Minta maaf</span>
+            </label>
+            <label class="template-card" data-template="general">
+              <input type="radio" name="template" value="general">
+              <span class="template-icon">🎁</span>
+              <span class="template-name">General</span>
+              <span class="template-desc">Buat apa saja</span>
+            </label>
+          </div>
+          <p class="field-hint">Pilih gaya kado yang sesuai. Template mengubah teks, emoji, dan GIF default.</p>
+        </fieldset>
+
+        <!-- ── Section 0.5: Tema & Background (Premium) ── -->
         <fieldset class="studio-section" id="section-theme" style="position: relative;">
           <legend>✨ Theme & Background</legend>
           
@@ -93,7 +119,7 @@
               <option value="midnight">Midnight (Dark Gray)</option>
             </select>
           </div>
-          <p class="field-hint">Pilih warna background utama kado ulang tahunmu.</p>
+          <p class="field-hint">Pilih warna background utama kado.</p>
         </fieldset>
 
         <!-- ── Section 0.5: Keamanan & Login Gate (Premium) ── -->
@@ -123,7 +149,7 @@
             <label for="input-recipient-name">Nama:</label>
             <input id="input-recipient-name" type="text" class="win-input" placeholder="Nama penerima..." maxlength="50">
           </div>
-          <div class="field-row">
+          <div class="field-row" id="field-age-row">
             <label for="input-age">Umur:</label>
             <input id="input-age" type="text" class="win-input" placeholder="20" maxlength="3" style="width:80px;">
           </div>
@@ -131,12 +157,16 @@
 
         <!-- ── Section 2: Stage 1 ── -->
         <fieldset class="studio-section">
-          <legend>🎂 Stage 1 — Welcome</legend>
+          <legend id="legend-stage1">🎂 Stage 1 — Welcome</legend>
           <div class="field-row">
             <label for="input-stage1-heading">Heading:</label>
             <input id="input-stage1-heading" type="text" class="win-input" placeholder="Happy 20th Birthday!" maxlength="80">
           </div>
-          <p class="field-hint">Teks yang muncul dengan typing animation di Stage 1.</p>
+          <div class="field-row">
+            <label for="input-stage1-gif">GIF URL:</label>
+            <input id="input-stage1-gif" type="url" class="win-input" placeholder="https://media.tenor.com/... (opsional)" maxlength="300">
+          </div>
+          <p class="field-hint">Teks yang muncul dengan typing animation di Stage 1. GIF opsional — kosongkan untuk default template.</p>
         </fieldset>
 
         <!-- ── Section 3: Stage 2 ── -->
@@ -162,15 +192,19 @@
             <label for="input-stage4-text">Reveal text:</label>
             <input id="input-stage4-text" type="text" class="win-input" placeholder="it's a birthday surprise!! :D" maxlength="80">
           </div>
-          <p class="field-hint">Teks yang muncul setelah hadiah dibuka (dengan confetti!).</p>
+          <div class="field-row">
+            <label for="input-stage4-gif">GIF URL:</label>
+            <input id="input-stage4-gif" type="url" class="win-input" placeholder="https://media.tenor.com/... (opsional)" maxlength="300">
+          </div>
+          <p class="field-hint">Teks yang muncul setelah hadiah dibuka (dengan confetti!). GIF opsional.</p>
         </fieldset>
 
-        <!-- ── Section 5: Stage 5 — Birthday Wishes ── -->
+        <!-- ── Section 5: Stage 5 — Personal Message ── -->
         <fieldset class="studio-section">
-          <legend>📝 Stage 5 — Birthday Wishes</legend>
+          <legend id="legend-stage5">📝 Stage 5 — Personal Message</legend>
           <div class="field-row field-row-full">
             <label for="input-stage5-wishes">Pesan:</label>
-            <textarea id="input-stage5-wishes" class="win-textarea" rows="10" placeholder="Dear kamu,&#10;&#10;Happy birthday!! 🎂&#10;&#10;Tulis pesan birthday kamu di sini..."></textarea>
+            <textarea id="input-stage5-wishes" class="win-textarea" rows="10" placeholder="Dear kamu,&#10;&#10;Tulis pesan spesialmu di sini..."></textarea>
           </div>
           <p class="field-hint">Pesan ini muncul dalam Notepad dengan typing animation. Tidak ada batas kata!</p>
         </fieldset>
@@ -235,7 +269,7 @@
         <span class="win-controls" id="btn-close-success" style="cursor:pointer;">✕</span>
       </div>
       <div class="win-body" style="padding:20px; text-align:center;">
-        <p style="margin-bottom:16px; font-size:1.1rem; font-weight:bold;">Kado Ulang Tahunmu sudah online!</p>
+        <p style="margin-bottom:16px; font-size:1.1rem; font-weight:bold;">Kadomu sudah online!</p>
         
         <!-- ═══ Aesthetic Retro QR Code ═══ -->
         <div style="display: flex; justify-content: center; margin-bottom: 24px;">
@@ -263,7 +297,7 @@
                 
                 <!-- Bottom text -->
                 <p style="font-family: 'VT323', 'Courier New', monospace; font-size: 1.1rem; color: #404040 !important; margin-top: 10px; text-transform: uppercase;">
-                  BIRTHDAY EDITION
+                  RETRO GIFT
                 </p>
               </div>
             </div>

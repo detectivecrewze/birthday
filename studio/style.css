@@ -292,4 +292,60 @@ body {
     height: auto;
     min-height: 24px;
   }
+
+  .template-selector {
+    flex-direction: column;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   Template Selector Cards
+═══════════════════════════════════════════════ */
+.template-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.template-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 8px 10px;
+  background: var(--gray);
+  box-shadow: var(--raise);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.1s;
+  user-select: none;
+}
+.template-card input[type="radio"] {
+  display: none;
+}
+.template-card:hover {
+  background: #e8e4dc;
+}
+.template-card:active {
+  box-shadow: var(--sink);
+  padding: 13px 7px 9px 9px;
+}
+.template-card.selected {
+  box-shadow: var(--sink);
+  background: #fff;
+}
+.template-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+.template-name {
+  font-family: var(--font);
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--black);
+}
+.template-desc {
+  font-family: var(--font);
+  font-size: 0.8rem;
+  color: var(--dark);
 }

@@ -8,6 +8,114 @@
 const WORKER_URL = 'https://birthday-retro.aldoramadhan16.workers.dev';
 
 /* ═══════════════════════════════════════════════
+   TEMPLATE DEFAULTS
+═══════════════════════════════════════════════ */
+const TEMPLATE_DEFAULTS = {
+  birthday: {
+    stage1_titlebar: '🎂 birthday_card.exe',
+    stage1_heading: 'Happy Birthday!',
+    stage1_gif: 'https://media1.tenor.com/m/tPJaogUqo8wAAAAC/happy-birthday.gif',
+    stage1_sparkle: '✨ ✨ ✨',
+    stage2_question: 'i have a surprise for\nyou, wanna see it?',
+    stage3_titlebar: '📁 C:\\birthday\\gift.exe',
+    stage3_instruction: 'tap on the gift to open your present! 🎁',
+    stage3_lid: '🎀',
+    stage3_base: '🎁',
+    stage3_statusbar: 'Stage 3 of 5 — Click the gift!',
+    stage4_titlebar: '🎉 surprise.exe — CONGRATS!',
+    stage4_reveal_text: "it's a birthday surprise!! :D",
+    stage4_gif: 'https://media.tenor.com/63IENW605s0AAAAi/dudu-twisting-dance.gif',
+    stage4_btn_text: 'my wishes',
+    stage5_titlebar: '📝 wishes.txt — Notepad',
+    stage5_wishes: 'Happy birthday! 🎂\n\nWith love ♡',
+    taskbar_label: '🎂 Birthday Card',
+  },
+  apology: {
+    stage1_titlebar: '💌 sorry_letter.exe',
+    stage1_heading: "I'm sorry...",
+    stage1_gif: 'https://media.tenor.com/SFy5Za0DyMEAAAAi/erm-fingers.gif',
+    stage1_sparkle: '💐 💐 💐',
+    stage2_question: 'i have something\nto say to you...',
+    stage3_titlebar: '📁 C:\\letters\\open_me.exe',
+    stage3_instruction: 'tap to open your gift! 🎁',
+    stage3_lid: '🎀',
+    stage3_base: '🎁',
+    stage3_statusbar: 'Stage 3 of 5 — Open the letter!',
+    stage4_titlebar: '🥺 please_forgive_me.exe',
+    stage4_reveal_text: 'Would you please forgive me?',
+    stage4_gif: 'https://media1.tenor.com/m/EW8DRbGzxDgAAAAC/im-sorry-forgive-me.gif',
+    stage4_btn_text: 'read my letter',
+    stage5_titlebar: '📝 letter.txt — Notepad',
+    stage5_wishes: 'Dear kamu,\n\nAku mau minta maaf...\n\nWith love ♡',
+    taskbar_label: '💌 Apology Letter',
+  },
+  general: {
+    stage1_titlebar: '🎁 special_gift.exe',
+    stage1_heading: 'This is for you!',
+    stage1_gif: 'https://media1.tenor.com/m/tPJaogUqo8wAAAAC/happy-birthday.gif',
+    stage1_sparkle: '✨ ✨ ✨',
+    stage2_question: 'i have something\nspecial for you...',
+    stage3_titlebar: '📁 C:\\gift\\open_me.exe',
+    stage3_instruction: 'tap to open your gift! 🎁',
+    stage3_lid: '🎀',
+    stage3_base: '🎁',
+    stage3_statusbar: 'Stage 3 of 5 — Open the gift!',
+    stage4_titlebar: '🎉 surprise.exe',
+    stage4_reveal_text: "surprise!! :D",
+    stage4_gif: 'https://media.tenor.com/63IENW605s0AAAAi/dudu-twisting-dance.gif',
+    stage4_btn_text: 'read my message',
+    stage5_titlebar: '📝 message.txt — Notepad',
+    stage5_wishes: 'Dear kamu,\n\nThis is for you...\n\nWith love ♡',
+    taskbar_label: '🎁 Special Gift',
+  },
+};
+
+function getTemplateDefault(cfg, key) {
+  const tpl = TEMPLATE_DEFAULTS[cfg.template] || TEMPLATE_DEFAULTS.birthday;
+  return tpl[key];
+}
+
+function applyTemplate(cfg) {
+  const tpl = TEMPLATE_DEFAULTS[cfg.template] || TEMPLATE_DEFAULTS.birthday;
+
+  // Stage 1
+  const s1Title = document.getElementById('stage1-titlebar');
+  if (s1Title) s1Title.textContent = tpl.stage1_titlebar;
+  const s1Gif = document.getElementById('stage1-gif');
+  if (s1Gif) s1Gif.src = cfg.stage1_gif || tpl.stage1_gif;
+  const s1Sparkle = document.getElementById('stage1-sparkle');
+  if (s1Sparkle) s1Sparkle.textContent = tpl.stage1_sparkle;
+
+  // Stage 3
+  const s3Title = document.getElementById('stage3-titlebar');
+  if (s3Title) s3Title.textContent = tpl.stage3_titlebar;
+  const s3Instr = document.getElementById('stage3-instruction');
+  if (s3Instr) s3Instr.textContent = tpl.stage3_instruction;
+  const s3Lid = document.getElementById('stage3-lid');
+  if (s3Lid) s3Lid.textContent = tpl.stage3_lid;
+  const s3Base = document.getElementById('stage3-base');
+  if (s3Base) s3Base.textContent = tpl.stage3_base;
+  const s3Status = document.getElementById('stage3-statusbar');
+  if (s3Status) s3Status.textContent = tpl.stage3_statusbar;
+
+  // Stage 4
+  const s4Title = document.getElementById('stage4-titlebar');
+  if (s4Title) s4Title.textContent = tpl.stage4_titlebar;
+  const s4Gif = document.getElementById('stage4-gif');
+  if (s4Gif) s4Gif.src = cfg.stage4_gif || tpl.stage4_gif;
+  const s4Btn = document.getElementById('stage4-btn-text');
+  if (s4Btn) s4Btn.textContent = tpl.stage4_btn_text;
+
+  // Stage 5
+  const s5Title = document.getElementById('stage5-titlebar');
+  if (s5Title) s5Title.textContent = tpl.stage5_titlebar;
+
+  // Taskbar
+  const taskbar = document.getElementById('taskbar-win-label');
+  if (taskbar) taskbar.textContent = tpl.taskbar_label;
+}
+
+/* ═══════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -28,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         cfg = { ...cfg, ...data };
       }
     } catch (e) {
-      console.warn('[Birthday] Failed to load config from Worker:', e);
+      console.warn('[RetroGift] Failed to load config from Worker:', e);
     }
   }
 
@@ -44,6 +152,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (cfg.theme) {
     applyTheme(cfg.theme);
   }
+
+  // Apply template-specific content
+  applyTemplate(cfg);
+  window._currentCfg = cfg;
 
   const skipAuth = params.get('skipAuth') === '1';
   const openMemory = params.get('openMemory') === '1';
@@ -151,13 +263,14 @@ function goToStage(id) {
   if (target) target.classList.add('active');
 
   // Update taskbar label
+  const tpl = TEMPLATE_DEFAULTS[window._currentCfg?.template] || TEMPLATE_DEFAULTS.birthday;
   const labels = {
     'stage-login': '🔐 Security check',
-    'stage-1': '🎂 Birthday Card',
+    'stage-1': tpl.taskbar_label,
     'stage-2': '❓ Question',
     'stage-3': '📁 gift.exe',
     'stage-4': '🎉 surprise.exe',
-    'stage-5': '📝 wishes.txt — Notepad',
+    'stage-5': tpl.stage5_titlebar,
     'stage-6': '🖼️ secret_memory.exe',
     'no-dialog': '⚠️ Error',
   };
@@ -238,7 +351,7 @@ function typeText(elementId, text, speed = 65, playAudio = false) {
    STAGE 1 — Welcome
 ═══════════════════════════════════════════════ */
 async function initStage1(cfg) {
-  const heading = cfg.stage1_heading || 'Happy Birthday!';
+  const heading = cfg.stage1_heading || getTemplateDefault(cfg, 'stage1_heading');
   const btn = document.getElementById('btn-next-1');
   const charEl = document.getElementById('stage1-char');
 
@@ -261,7 +374,7 @@ async function initStage1(cfg) {
    STAGE 2 — Question
 ═══════════════════════════════════════════════ */
 async function initStage2(cfg) {
-  const question = cfg.stage2_question || 'i have a surprise for\nyou, wanna see it?';
+  const question = cfg.stage2_question || getTemplateDefault(cfg, 'stage2_question');
   await typeText('stage2-text', question, 55, true);
 }
 
@@ -331,17 +444,17 @@ function launchConfetti(colors) {
 }
 
 async function initStage4(cfg) {
-  const text = cfg.stage4_reveal_text || "it's a surprise!! :D";
+  const text = cfg.stage4_reveal_text || getTemplateDefault(cfg, 'stage4_reveal_text');
   const colors = cfg.confetti_colors || ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#ff6bb5'];
   launchConfetti(colors);
   await typeText('stage4-title', text, 50);
 }
 
 /* ═══════════════════════════════════════════════
-   STAGE 5 — Birthday wishes (Notepad typing)
+   STAGE 5 — Personal Message (Notepad typing)
 ═══════════════════════════════════════════════ */
 async function initStage5(cfg) {
-  const wishes = cfg.stage5_wishes || 'Happy birthday! 🎂\n\nWith love ♡';
+  const wishes = cfg.stage5_wishes || getTemplateDefault(cfg, 'stage5_wishes');
   await typeText('stage5-message', wishes, 50, true);
 
   // Update line/col counter

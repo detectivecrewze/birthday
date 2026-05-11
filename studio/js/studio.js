@@ -23,17 +23,118 @@ const Studio = (() => {
     if (ok) initPostAuth();
   }
 
+  // ── Template Presets ──────────────────────────────────
+  const TEMPLATE_PRESETS = {
+    birthday: {
+      stage1_legend: '🎂 Stage 1 — Welcome',
+      stage1_heading_placeholder: 'Happy 20th Birthday!',
+      stage1_heading_default: 'Happy Birthday!',
+      stage2_question_placeholder: 'i have a surprise for\nyou, wanna see it?',
+      stage4_text_placeholder: "it's a birthday surprise!! :D",
+      stage5_legend: '📝 Stage 5 — Birthday Wishes',
+      stage5_placeholder: 'Dear kamu,\n\nHappy birthday!! 🎂\n\nTulis pesan birthday kamu di sini...',
+      showAge: true,
+    },
+    apology: {
+      stage1_legend: '💌 Stage 1 — Welcome',
+      stage1_heading_placeholder: "I'm sorry...",
+      stage1_heading_default: "I'm sorry...",
+      stage2_question_placeholder: 'i have something\nto say to you...',
+      stage4_text_placeholder: 'Would you please forgive me?',
+      stage5_legend: '📝 Stage 5 — Apology Letter',
+      stage5_placeholder: 'Dear kamu,\n\nAku mau minta maaf...\n\nTulis pesan kamu di sini...',
+      showAge: false,
+    },
+    general: {
+      stage1_legend: '🎁 Stage 1 — Welcome',
+      stage1_heading_placeholder: 'This is for you!',
+      stage1_heading_default: 'This is for you!',
+      stage2_question_placeholder: 'i have something\nspecial for you...',
+      stage4_text_placeholder: "surprise!! :D",
+      stage5_legend: '📝 Stage 5 — Personal Message',
+      stage5_placeholder: 'Dear kamu,\n\nTulis pesan spesialmu di sini...',
+      showAge: false,
+    },
+  };
+
+  let _currentTemplate = 'birthday';
+
+  function _applyTemplatePlaceholders(templateId) {
+    const preset = TEMPLATE_PRESETS[templateId];
+    if (!preset) return;
+
+    _currentTemplate = templateId;
+
+    // Update legends
+    const legendStage1 = document.getElementById('legend-stage1');
+    const legendStage5 = document.getElementById('legend-stage5');
+    if (legendStage1) legendStage1.textContent = preset.stage1_legend;
+    if (legendStage5) legendStage5.textContent = preset.stage5_legend;
+
+    // Update placeholders (does NOT overwrite user values)
+    const headingInput = document.getElementById('input-stage1-heading');
+    const questionInput = document.getElementById('input-stage2-question');
+    const revealInput = document.getElementById('input-stage4-text');
+    const wishesInput = document.getElementById('input-stage5-wishes');
+
+    if (headingInput) headingInput.placeholder = preset.stage1_heading_placeholder;
+    if (questionInput) questionInput.placeholder = preset.stage2_question_placeholder;
+    if (revealInput) revealInput.placeholder = preset.stage4_text_placeholder;
+    if (wishesInput) wishesInput.placeholder = preset.stage5_placeholder;
+
+    // Show/hide age field
+    const ageRow = document.getElementById('field-age-row');
+    if (ageRow) ageRow.style.display = preset.showAge ? '' : 'none';
+
+    // Update template card selection UI
+    document.querySelectorAll('.template-card').forEach(card => {
+      card.classList.toggle('selected', card.dataset.template === templateId);
+      const radio = card.querySelector('input[type="radio"]');
+      if (radio) radio.checked = card.dataset.template === templateId;
+    });
+  }
+
   function initPostAuth() {
     const cfg = Auth.getInitialConfig() || {};
     _isPremium = cfg.isPremium === true;
 
+    // ── Template selection ──
+    const savedTemplate = cfg.template || 'birthday';
+    _currentTemplate = savedTemplate;
+    _applyTemplatePlaceholders(savedTemplate);
+
+    // Bind template selector
+    document.querySelectorAll('.template-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const tpl = card.dataset.template;
+        _applyTemplatePlaceholders(tpl);
+
+        // Auto-update heading if user hasn't edited it
+        const headingInput = document.getElementById('input-stage1-heading');
+        if (headingInput && !headingInput.dataset.userEdited) {
+          const preset = TEMPLATE_PRESETS[tpl];
+          if (tpl === 'birthday') {
+            autoHeading();
+          } else {
+            headingInput.value = preset.stage1_heading_default;
+          }
+        }
+
+        Autosave.trigger();
+      });
+    });
+
     // Populate fields from saved config
     _setVal('input-recipient-name', cfg.recipientName);
     _setVal('input-age', cfg.age);
-    _setVal('input-stage1-heading', cfg.stage1_heading || `Happy ${cfg.age || '?'}th Birthday!`);
-    _setVal('input-stage2-question', cfg.stage2_question || 'i have a surprise for\nyou, wanna see it?');
-    _setVal('input-stage4-text', cfg.stage4_reveal_text || "it's a birthday surprise!! :D");
+    _setVal('input-stage1-heading', cfg.stage1_heading || TEMPLATE_PRESETS[savedTemplate].stage1_heading_default);
+    _setVal('input-stage2-question', cfg.stage2_question || '');
+    _setVal('input-stage4-text', cfg.stage4_reveal_text || '');
     _setVal('input-stage5-wishes', cfg.stage5_wishes);
+
+    // GIF URL fields
+    _setVal('input-stage1-gif', cfg.stage1_gif || '');
+    _setVal('input-stage4-gif', cfg.stage4_gif || '');
 
     // Initialize Music Manager
     if (typeof Music !== 'undefined') {
@@ -95,8 +196,10 @@ const Studio = (() => {
       const name = nameInput?.value.trim() || '';
       const age = ageInput?.value.trim() || '';
       if (headingInput && !headingInput.dataset.userEdited) {
-        const suffix = age ? `${age}th` : '';
-        headingInput.value = `Happy ${suffix} Birthday${name ? ', ' + name : ''}!`;
+        if (_currentTemplate === 'birthday') {
+          const suffix = age ? `${age}th` : '';
+          headingInput.value = `Happy ${suffix} Birthday${name ? ', ' + name : ''}!`;
+        }
       }
     }
     nameInput?.addEventListener('input', () => { autoHeading(); Autosave.trigger(); });
@@ -104,7 +207,7 @@ const Studio = (() => {
     headingInput?.addEventListener('input', () => { headingInput.dataset.userEdited = '1'; Autosave.trigger(); });
 
     // Bind autosave to all inputs and selects
-    document.querySelectorAll('#studio-main textarea, #studio-main input[type="text"]').forEach(el => {
+    document.querySelectorAll('#studio-main textarea, #studio-main input[type="text"], #studio-main input[type="url"]').forEach(el => {
       el.addEventListener('input', () => Autosave.trigger());
     });
     document.querySelectorAll('#studio-main select').forEach(el => {
@@ -140,7 +243,7 @@ const Studio = (() => {
     document.getElementById('loading-screen')?.classList.add('hidden');
     document.getElementById('studio-main')?.classList.remove('hidden');
 
-    showToast('Studio siap! 🎂');
+    showToast('Studio siap! 🎁');
   }
 
   // ── Secret Memory — Multi-Photo Gallery ─────────────────

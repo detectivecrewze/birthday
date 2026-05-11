@@ -60,6 +60,10 @@ const Autosave = (() => {
       studioToken: token,
       giftId: token,
       studioPassword: Auth.getInitialConfig()?.studioPassword || null,
+
+      // Template
+      template: document.querySelector('input[name="template"]:checked')?.value || 'birthday',
+
       // Theme
       theme: document.getElementById('input-theme')?.value || 'classic',
       
@@ -73,8 +77,10 @@ const Autosave = (() => {
 
       // Stage content
       stage1_heading: document.getElementById('input-stage1-heading')?.value.trim() || '',
-      stage2_question: document.getElementById('input-stage2-question')?.value.trim() || 'i have a surprise for\nyou, wanna see it?',
-      stage4_reveal_text: document.getElementById('input-stage4-text')?.value.trim() || "it's a birthday surprise!! :D",
+      stage1_gif: document.getElementById('input-stage1-gif')?.value.trim() || '',
+      stage2_question: document.getElementById('input-stage2-question')?.value.trim() || '',
+      stage4_reveal_text: document.getElementById('input-stage4-text')?.value.trim() || '',
+      stage4_gif: document.getElementById('input-stage4-gif')?.value.trim() || '',
       stage5_wishes: document.getElementById('input-stage5-wishes')?.value || '',
 
       // Secret Media
