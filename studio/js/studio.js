@@ -30,7 +30,9 @@ const Studio = (() => {
       stage1_heading_placeholder: 'Happy 20th Birthday!',
       stage1_heading_default: 'Happy Birthday!',
       stage2_question_placeholder: 'i have a surprise for\nyou, wanna see it?',
+      stage2_question_default: 'i have a surprise for\nyou, wanna see it?',
       stage4_text_placeholder: "it's a birthday surprise!! :D",
+      stage4_text_default: "it's a birthday surprise!! :D",
       stage5_legend: '📝 Stage 5 — Birthday Wishes',
       stage5_placeholder: 'Dear kamu,\n\nHappy birthday!! 🎂\n\nTulis pesan birthday kamu di sini...',
       showAge: true,
@@ -40,7 +42,9 @@ const Studio = (() => {
       stage1_heading_placeholder: "I'm sorry...",
       stage1_heading_default: "I'm sorry...",
       stage2_question_placeholder: 'i have something\nto say to you...',
+      stage2_question_default: 'i have something\nto say to you...',
       stage4_text_placeholder: 'Would you please forgive me?',
+      stage4_text_default: 'Would you please forgive me?',
       stage5_legend: '📝 Stage 5 — Apology Letter',
       stage5_placeholder: 'Dear kamu,\n\nAku mau minta maaf...\n\nTulis pesan kamu di sini...',
       showAge: false,
@@ -50,7 +54,9 @@ const Studio = (() => {
       stage1_heading_placeholder: 'This is for you!',
       stage1_heading_default: 'This is for you!',
       stage2_question_placeholder: 'i have something\nspecial for you...',
+      stage2_question_default: 'i have a message\nfor you...',
       stage4_text_placeholder: "surprise!! :D",
+      stage4_text_default: "surprise!! :D",
       stage5_legend: '📝 Stage 5 — Personal Message',
       stage5_placeholder: 'Dear kamu,\n\nTulis pesan spesialmu di sini...',
       showAge: false,
@@ -109,15 +115,28 @@ const Studio = (() => {
         const tpl = card.dataset.template;
         _applyTemplatePlaceholders(tpl);
 
-        // Auto-update heading if user hasn't edited it
+        // Auto-update fields if user hasn't edited them or they are empty
         const headingInput = document.getElementById('input-stage1-heading');
+        const questionInput = document.getElementById('input-stage2-question');
+        const revealInput = document.getElementById('input-stage4-text');
+        const preset = TEMPLATE_PRESETS[tpl];
+
         if (headingInput && !headingInput.dataset.userEdited) {
-          const preset = TEMPLATE_PRESETS[tpl];
           if (tpl === 'birthday') {
             autoHeading();
           } else {
             headingInput.value = preset.stage1_heading_default;
           }
+        }
+
+        // Fill question if empty
+        if (questionInput && !questionInput.value.trim()) {
+          questionInput.value = preset.stage2_question_default;
+        }
+
+        // Fill reveal text if empty
+        if (revealInput && !revealInput.value.trim()) {
+          revealInput.value = preset.stage4_text_default;
         }
 
         Autosave.trigger();
@@ -128,8 +147,8 @@ const Studio = (() => {
     _setVal('input-recipient-name', cfg.recipientName);
     _setVal('input-age', cfg.age);
     _setVal('input-stage1-heading', cfg.stage1_heading || TEMPLATE_PRESETS[savedTemplate].stage1_heading_default);
-    _setVal('input-stage2-question', cfg.stage2_question || '');
-    _setVal('input-stage4-text', cfg.stage4_reveal_text || '');
+    _setVal('input-stage2-question', cfg.stage2_question || TEMPLATE_PRESETS[savedTemplate].stage2_question_default);
+    _setVal('input-stage4-text', cfg.stage4_reveal_text || TEMPLATE_PRESETS[savedTemplate].stage4_text_default);
     _setVal('input-stage5-wishes', cfg.stage5_wishes);
 
     // GIF URL fields
