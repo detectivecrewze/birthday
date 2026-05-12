@@ -283,7 +283,7 @@ const Studio = (() => {
         if (section) {
           section.classList.toggle('feature-section-hidden', !toggle.checked);
         }
-        Autosave.trigger();
+        Autosave.saveNow(); // Save immediately, don't wait for debounce
       });
     });
 
