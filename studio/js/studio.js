@@ -129,13 +129,13 @@ const Studio = (() => {
           }
         }
 
-        // Fill question if empty
-        if (questionInput && !questionInput.value.trim()) {
+        // Fill question if empty or not edited
+        if (questionInput && (!questionInput.dataset.userEdited || !questionInput.value.trim())) {
           questionInput.value = preset.stage2_question_default;
         }
 
-        // Fill reveal text if empty
-        if (revealInput && !revealInput.value.trim()) {
+        // Fill reveal text if empty or not edited
+        if (revealInput && (!revealInput.dataset.userEdited || !revealInput.value.trim())) {
           revealInput.value = preset.stage4_text_default;
         }
 
@@ -210,6 +210,8 @@ const Studio = (() => {
     const nameInput = document.getElementById('input-recipient-name');
     const ageInput = document.getElementById('input-age');
     const headingInput = document.getElementById('input-stage1-heading');
+    const questionInput = document.getElementById('input-stage2-question');
+    const revealInput = document.getElementById('input-stage4-text');
 
     function autoHeading() {
       const name = nameInput?.value.trim() || '';
@@ -223,7 +225,10 @@ const Studio = (() => {
     }
     nameInput?.addEventListener('input', () => { autoHeading(); Autosave.trigger(); });
     ageInput?.addEventListener('input', () => { autoHeading(); Autosave.trigger(); });
+
     headingInput?.addEventListener('input', () => { headingInput.dataset.userEdited = '1'; Autosave.trigger(); });
+    questionInput?.addEventListener('input', () => { questionInput.dataset.userEdited = '1'; Autosave.trigger(); });
+    revealInput?.addEventListener('input', () => { revealInput.dataset.userEdited = '1'; Autosave.trigger(); });
 
     // Bind autosave to all inputs and selects
     document.querySelectorAll('#studio-main textarea, #studio-main input[type="text"], #studio-main input[type="url"]').forEach(el => {
