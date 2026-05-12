@@ -349,3 +349,86 @@ body {
   font-size: 0.8rem;
   color: var(--dark);
 }
+
+/* ═══════════════════════════════════════════════
+   Feature Toggle Panel
+═══════════════════════════════════════════════ */
+.feature-toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.feature-toggle-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--gray);
+  box-shadow: var(--raise);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+.feature-toggle-item:hover {
+  background: #e8e4dc;
+}
+.toggle-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+.toggle-label {
+  font-family: var(--font);
+  font-size: 1rem;
+  color: var(--black);
+  flex: 1;
+}
+
+/* Win98-style toggle switch */
+.toggle-switch-wrap {
+  position: relative;
+  width: 36px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.toggle-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-switch {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  box-shadow: var(--sink);
+  cursor: pointer;
+}
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: var(--gray);
+  box-shadow: var(--raise);
+  transition: left 0.15s ease;
+}
+.toggle-checkbox:checked + .toggle-switch {
+  background: var(--blue);
+}
+.toggle-checkbox:checked + .toggle-switch::after {
+  left: 20px;
+  background: #fff;
+}
+
+/* Toggled-off section styling */
+.feature-section-hidden {
+  display: none !important;
+}
+
+@media (max-width: 480px) {
+  .feature-toggle-grid {
+    grid-template-columns: 1fr;
+  }
+}

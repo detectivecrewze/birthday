@@ -263,6 +263,30 @@ const Studio = (() => {
       upgradeSection.style.display = _isPremium ? 'none' : 'block';
     }
 
+    // ── Feature Toggles ──────────────────────────────────
+    const featureToggles = document.querySelectorAll('.toggle-checkbox');
+    const savedToggles = cfg.featureToggles || {};
+    
+    featureToggles.forEach(toggle => {
+      const targetId = toggle.dataset.target;
+      const targetSection = document.getElementById(targetId);
+      if (!targetSection) return;
+
+      // Restore saved state (default: OFF / hidden)
+      const isOn = savedToggles[targetId] === true;
+      toggle.checked = isOn;
+      targetSection.classList.toggle('feature-section-hidden', !isOn);
+
+      // Bind change event
+      toggle.addEventListener('change', () => {
+        const section = document.getElementById(targetId);
+        if (section) {
+          section.classList.toggle('feature-section-hidden', !toggle.checked);
+        }
+        Autosave.trigger();
+      });
+    });
+
     // Show studio
     document.getElementById('loading-screen')?.classList.add('hidden');
     document.getElementById('studio-main')?.classList.remove('hidden');

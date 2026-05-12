@@ -100,6 +100,46 @@
           <p class="field-hint">Pilih gaya kado yang sesuai. Template mengubah teks, emoji, dan GIF default.</p>
         </fieldset>
 
+        <!-- ── Section 0.5: Feature Toggles (Premium) ── -->
+        <fieldset class="studio-section" id="section-feature-toggles">
+          <legend>⚙️ Fitur Tambahan (Premium)</legend>
+          <p class="field-hint" style="margin-bottom: 10px;">Aktifkan fitur yang kamu butuhkan. Fitur yang dimatikan akan disembunyikan dari editor.</p>
+          <div class="feature-toggle-grid">
+            <label class="feature-toggle-item" for="toggle-theme">
+              <div class="toggle-switch-wrap">
+                <input type="checkbox" id="toggle-theme" class="toggle-checkbox" data-target="section-theme">
+                <span class="toggle-switch"></span>
+              </div>
+              <span class="toggle-icon">🎨</span>
+              <span class="toggle-label">Tema Warna</span>
+            </label>
+            <label class="feature-toggle-item" for="toggle-password">
+              <div class="toggle-switch-wrap">
+                <input type="checkbox" id="toggle-password" class="toggle-checkbox" data-target="section-login">
+                <span class="toggle-switch"></span>
+              </div>
+              <span class="toggle-icon">🔐</span>
+              <span class="toggle-label">Password</span>
+            </label>
+            <label class="feature-toggle-item" for="toggle-music">
+              <div class="toggle-switch-wrap">
+                <input type="checkbox" id="toggle-music" class="toggle-checkbox" data-target="section-music">
+                <span class="toggle-switch"></span>
+              </div>
+              <span class="toggle-icon">🎵</span>
+              <span class="toggle-label">Musik</span>
+            </label>
+            <label class="feature-toggle-item" for="toggle-media">
+              <div class="toggle-switch-wrap">
+                <input type="checkbox" id="toggle-media" class="toggle-checkbox" data-target="section-memory">
+                <span class="toggle-switch"></span>
+              </div>
+              <span class="toggle-icon">📸</span>
+              <span class="toggle-label">Secret Media</span>
+            </label>
+          </div>
+        </fieldset>
+
         <!-- ── Section 0.5: Tema & Background (Premium) ── -->
         <fieldset class="studio-section" id="section-theme" style="position: relative;">
           <legend>✨ Theme & Background</legend>
@@ -180,7 +220,7 @@
         </fieldset>
 
         <!-- ── Section 4: Music ── -->
-        <fieldset class="studio-section">
+        <fieldset class="studio-section" id="section-music">
           <legend>🎵 Musik / Lagu (Max 3)</legend>
           <div id="music-slots-container"></div>
           <p class="field-hint" style="margin-top: 8px;">Pilih lagu kesukaannya. Bagian ini opsional — jika dikosongkan, musik tidak akan diputar.</p>

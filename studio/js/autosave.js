@@ -93,6 +93,16 @@ const Autosave = (() => {
       isPremium: Auth.getInitialConfig()?.isPremium || false,
       status: Auth.getInitialConfig()?.status || 'draft',
       is_active: true,
+
+      // Feature toggles state
+      featureToggles: (() => {
+        const toggles = {};
+        document.querySelectorAll('.toggle-checkbox').forEach(cb => {
+          if (cb.dataset.target) toggles[cb.dataset.target] = cb.checked;
+        });
+        return toggles;
+      })(),
+
       _meta: { theme_folder: 'birthday-retro' },
     };
     return state;
