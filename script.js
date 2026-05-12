@@ -510,7 +510,7 @@ function initStage6(cfg) {
       video.src = item.url;
       video.autoplay = true;
       video.loop = true;
-      video.muted = false;
+      video.muted = true;
       video.playsInline = true;
       video.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;display:block;';
       container.appendChild(video);

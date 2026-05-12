@@ -287,11 +287,96 @@ const Studio = (() => {
       });
     });
 
+    // Init GIF Picker
+    initGifPicker();
+
     // Show studio
     document.getElementById('loading-screen')?.classList.add('hidden');
     document.getElementById('studio-main')?.classList.remove('hidden');
 
     showToast('Studio siap! 🎁');
+  }
+
+  // ── GIF Picker ───────────────────────────────────────
+  function initGifPicker() {
+    const overlay   = document.getElementById('gif-picker-overlay');
+    const grid      = document.getElementById('gif-picker-grid');
+    const titleEl   = document.getElementById('gif-picker-title');
+    const closeBtn  = document.getElementById('btn-gif-picker-close');
+    const customUrl = document.getElementById('gif-picker-custom-url');
+    const useCustom = document.getElementById('btn-gif-picker-use-custom');
+    if (!overlay || !grid) return;
+
+    let _targetInputId = null; // which input to fill
+
+    // Open picker when any "Pilih GIF" button is clicked
+    document.querySelectorAll('.gif-pick-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _targetInputId = btn.dataset.input;
+        const stage    = btn.dataset.stage; // 'stage1' or 'stage4'
+        const tpl      = _currentTemplate || 'birthday';
+        const stageLabel = stage === 'stage1' ? 'Stage 1 — Welcome' : 'Stage 4 — Reveal';
+        if (titleEl) titleEl.textContent = `🖼️ Pilih GIF — ${stageLabel}`;
+
+        // Get current value of the target input to pre-select
+        const currentVal = document.getElementById(_targetInputId)?.value.trim() || '';
+        if (customUrl) customUrl.value = currentVal;
+
+        // Build grid
+        _renderGifGrid(tpl, stage, currentVal);
+
+        overlay.classList.remove('hidden');
+      });
+    });
+
+    // Close button
+    closeBtn?.addEventListener('click', () => overlay.classList.add('hidden'));
+
+    // Close on backdrop click
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.classList.add('hidden');
+    });
+
+    // Use custom URL
+    useCustom?.addEventListener('click', () => {
+      _applyGif(customUrl?.value.trim() || '');
+    });
+    customUrl?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') _applyGif(customUrl.value.trim());
+    });
+
+    function _renderGifGrid(template, stage, selectedUrl) {
+      grid.innerHTML = '';
+      const lib  = (typeof GIF_LIBRARY !== 'undefined') ? GIF_LIBRARY : {};
+      const gifs = lib[template] || []; // flat array of URL strings
+
+      if (!gifs.length) {
+        grid.innerHTML = '<p class="gif-picker-empty">Belum ada GIF untuk template ini.</p>';
+        return;
+      }
+
+      gifs.forEach(url => {
+        const item = document.createElement('div');
+        item.className = 'gif-picker-item' + (url === selectedUrl ? ' selected' : '');
+        item.innerHTML = `<img class="gif-picker-img" src="${url}" alt="GIF" loading="lazy">`;
+        item.addEventListener('click', () => {
+          grid.querySelectorAll('.gif-picker-item').forEach(i => i.classList.remove('selected'));
+          item.classList.add('selected');
+          _applyGif(url);
+        });
+        grid.appendChild(item);
+      });
+    }
+
+    function _applyGif(url) {
+      const input = document.getElementById(_targetInputId);
+      if (input) {
+        input.value = url;
+        input.dispatchEvent(new Event('input')); // trigger autosave
+      }
+      overlay.classList.add('hidden');
+      showToast(url ? 'GIF dipilih! ✓' : 'GIF dikosongkan.');
+    }
   }
 
   // ── Secret Memory — Multi-Photo Gallery ─────────────────

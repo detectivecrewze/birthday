@@ -203,8 +203,9 @@
             <input id="input-stage1-heading" type="text" class="win-input" placeholder="Happy 20th Birthday!" maxlength="80">
           </div>
           <div class="field-row">
-            <label for="input-stage1-gif">GIF URL:</label>
+            <label for="input-stage1-gif">GIF:</label>
             <input id="input-stage1-gif" type="url" class="win-input" placeholder="https://media.tenor.com/... (opsional)" maxlength="300">
+            <button type="button" class="win-btn gif-pick-btn" data-input="input-stage1-gif" data-stage="stage1" title="Pilih GIF dari library">🖼️ Pilih</button>
           </div>
           <p class="field-hint">Teks yang muncul dengan typing animation di Stage 1. GIF opsional — kosongkan untuk default template.</p>
         </fieldset>
@@ -234,8 +235,9 @@
             <input id="input-stage4-text" type="text" class="win-input" placeholder="it's a birthday surprise!! :D" maxlength="80">
           </div>
           <div class="field-row">
-            <label for="input-stage4-gif">GIF URL:</label>
+            <label for="input-stage4-gif">GIF:</label>
             <input id="input-stage4-gif" type="url" class="win-input" placeholder="https://media.tenor.com/... (opsional)" maxlength="300">
+            <button type="button" class="win-btn gif-pick-btn" data-input="input-stage4-gif" data-stage="stage4" title="Pilih GIF dari library">🖼️ Pilih</button>
           </div>
           <p class="field-hint">Teks yang muncul setelah hadiah dibuka (dengan confetti!). GIF opsional.</p>
         </fieldset>
@@ -359,6 +361,30 @@
     </div>
   </div>
 
+  <!-- ═══ GIF PICKER MODAL ═══ -->
+  <div id="gif-picker-overlay" class="screen-overlay hidden" style="background:rgba(0,0,0,0.5); z-index:500;">
+    <div class="win-dialog" style="width:min(520px,94vw); max-height:85vh; display:flex; flex-direction:column;">
+      <div class="win-titlebar">
+        <span class="win-title-text" id="gif-picker-title">🖼️ Pilih GIF</span>
+        <button id="btn-gif-picker-close" class="win-btn" style="padding:0 8px; min-width:auto; font-size:1rem;">✕</button>
+      </div>
+      <div class="win-menubar" style="font-size:0.85rem; color:#555;">Klik GIF untuk memilih. Scroll untuk melihat lebih banyak.</div>
+      <div style="background:#ffffcc; border:1px solid #808000; padding:6px 10px; margin:8px 12px 0; font-size:0.85rem; color:#404000;">
+        💡 <strong>Tips:</strong> Cari GIF lainnya di <a href="https://tenor.com/" target="_blank" style="color:#0000ff;">Tenor.com</a>. Pastikan pilih <strong>"Copy GIF Address"</strong> (bukan link halaman) jika ingin memakai URL sendiri.
+      </div>
+      <div style="padding:12px; overflow-y:auto; flex:1;">
+        <div id="gif-picker-grid" class="gif-picker-grid"></div>
+        <div style="margin-top:12px; border-top:1px solid #808080; padding-top:10px;">
+          <p style="font-size:0.9rem; margin-bottom:6px;">✏️ Atau pakai URL GIF sendiri:</p>
+          <div style="display:flex; gap:6px;">
+            <input id="gif-picker-custom-url" type="url" class="win-input" placeholder="https://media.tenor.com/..." style="flex:1;">
+            <button id="btn-gif-picker-use-custom" class="win-btn">Pakai</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══ TOAST ═══ -->
   <div id="toast" class="toast hidden"></div>
 
@@ -366,6 +392,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+  <script src="js/gif-library.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/music.js"></script>
   <script src="js/studio.js"></script>

@@ -432,3 +432,71 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ═══════════════════════════════════════════════
+   GIF Picker
+═══════════════════════════════════════════════ */
+.gif-pick-btn {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.gif-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.gif-picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: var(--white);
+  box-shadow: var(--raise);
+  cursor: pointer;
+  transition: background 0.1s;
+  text-align: center;
+}
+.gif-picker-item:hover {
+  background: #c8e4ff;
+  box-shadow: var(--sink);
+}
+.gif-picker-item.selected {
+  background: #000080;
+  box-shadow: var(--sink);
+}
+.gif-picker-item.selected .gif-picker-label {
+  color: #fff;
+}
+.gif-picker-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  background: #d4d0c8;
+  image-rendering: auto;
+}
+.gif-picker-label {
+  font-family: var(--font);
+  font-size: 0.8rem;
+  color: var(--black);
+  word-break: break-word;
+}
+
+.gif-picker-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  color: var(--dark);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+  .gif-picker-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
