@@ -11,24 +11,8 @@
 </head>
 <body>
 
-  <!-- ═══ LOGIN ═══ -->
-  <div id="login-screen" class="screen-overlay">
-    <div class="win-dialog" style="width:360px;">
-      <div class="win-titlebar"><span class="win-title-text">🔐 Admin Login</span></div>
-      <div class="win-body" style="padding:20px;">
-        <p style="margin-bottom:10px;">Enter admin password:</p>
-        <input id="admin-pass" type="password" class="win-input" placeholder="Password..." style="width:100%;">
-        <p id="login-error" class="hidden" style="color:red;font-size:0.9rem;margin-top:6px;">Invalid password.</p>
-        <div style="text-align:right;margin-top:12px;">
-          <button id="btn-login" class="win-btn">Login</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ MAIN DASHBOARD ═══ -->
+  <!-- ═══ MAIN DASHBOARD (Hidden by default) ═══ -->
   <div id="dashboard" class="hidden">
-
     <!-- Taskbar -->
     <div class="admin-taskbar">
       <span>🪟 <strong>Admin</strong></span>
@@ -80,7 +64,6 @@
       <div class="panel-window">
         <div class="win-titlebar"><span class="win-title-text">🔗 Link Generator</span></div>
         <div class="win-body" style="padding:20px;">
-
           <!-- Generator login -->
           <fieldset class="gen-section" id="gen-login-section">
             <legend>🔑 Generator Auth</legend>
@@ -133,12 +116,25 @@
             <button id="btn-change-id" class="win-btn" style="margin-top:8px;">Change ID</button>
             <p id="change-result" class="hidden" style="margin-top:8px;"></p>
           </fieldset>
-
         </div>
       </div>
     </div>
-
   </div><!-- /dashboard -->
+
+  <!-- ═══ LOGIN SCREEN (Shows first) ═══ -->
+  <div id="login-screen" class="screen-overlay">
+    <div class="win-dialog" style="width:360px;">
+      <div class="win-titlebar"><span class="win-title-text">🔐 Admin Login</span></div>
+      <div class="win-body" style="padding:20px;">
+        <p style="margin-bottom:10px;">Enter admin password:</p>
+        <input id="admin-pass" type="password" class="win-input" placeholder="Password..." style="width:100%;">
+        <p id="login-error" class="hidden" style="color:red;font-size:0.9rem;margin-top:6px;">Invalid password.</p>
+        <div style="text-align:right;margin-top:12px;">
+          <button id="btn-login" class="win-btn">Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
