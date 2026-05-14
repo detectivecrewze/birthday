@@ -1,7 +1,8 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/studio/:id", "destination": "/studio/index.html" },
-    { "source": "/:id", "destination": "/index.html" }
+    { "source": "/studio/(.*)", "destination": "/studio/index.html" },
+    { "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
