@@ -209,7 +209,7 @@ var index_default = {
           success: true,
           message: 'Birthday card saved!',
           id,
-          previewUrl: `https://retro.for-you-always.my.id/?to=${id}`,
+          previewUrl: `https://retro.for-you-always.my.id/${id}`,
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -324,8 +324,8 @@ var index_default = {
         return new Response(JSON.stringify({
           success: true,
           id: customId,
-          studioUrl: `${domainUrl}/studio/?to=${customId}`,
-          giftUrl: `${domainUrl}/?to=${customId}`,
+          studioUrl: `${domainUrl}/studio/${customId}`,
+          giftUrl: `${domainUrl}/${customId}`,
           message: 'Link berhasil dibuat',
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       } catch (error) {

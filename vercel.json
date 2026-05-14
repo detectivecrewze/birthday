@@ -1,3 +1,9 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/studio/retro-:path", "destination": "/studio/index.html" },
+    { "source": "/studio/bday-:path", "destination": "/studio/index.html" },
+    { "source": "/retro-:path", "destination": "/index.html" },
+    { "source": "/bday-:path", "destination": "/index.html" }
+  ]
 }

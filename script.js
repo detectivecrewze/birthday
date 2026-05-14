@@ -123,7 +123,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Check for ?to= parameter → load from Worker
   const params = new URLSearchParams(window.location.search);
-  const giftId = params.get('to');
+  let giftId = params.get('to');
+  if (!giftId) {
+    const path = window.location.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+    if (path.length > 0 && (path[0].startsWith('retro-') || path[0].startsWith('bday-'))) {
+      giftId = path[0];
+    }
+  }
   let cfg = window.BIRTHDAY_CONFIG || {};
 
   if (giftId) {
