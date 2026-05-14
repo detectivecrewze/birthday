@@ -266,7 +266,7 @@ body {
   font-family: var(--font);
   font-size: 2rem;
   color: var(--black);
-  min-height: 2.4em;
+  min-height: 1.6em;
   line-height: 1.2;
 }
 
@@ -288,7 +288,7 @@ body {
   flex-direction: column;
   align-items: center;
 }
-.cake-gif { width: 140px; height: auto; margin-bottom: 8px; }
+.cake-gif { width: 140px; height: auto; margin-bottom: 24px; }
 .cake-sparkle {
   font-size: 1.2rem;
   animation: sparkle 1.5s ease-in-out infinite;
