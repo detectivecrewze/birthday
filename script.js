@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const titleText = dialogMain.querySelector('.win-titlebar-text');
       const bodyText = dialogMain.querySelector('.win-body p');
       if (titleText) titleText.textContent = '👋 Welcome';
-      if (bodyText) bodyText.textContent = 'Klik OK untuk membuka kado spesialmu! 🎁';
+      if (bodyText) bodyText.textContent = 'Click OK to open your special gift! 🎁';
       if (input) input.style.display = 'none';
       if (hintText) hintText.style.display = 'none';
     }
