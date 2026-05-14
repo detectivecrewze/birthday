@@ -154,6 +154,18 @@ body {
   z-index: 999;
   font-family: var(--font);
   font-size: 1rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.studio-taskbar::-webkit-scrollbar {
+  display: none;
+}
+.studio-taskbar > * {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .taskbar-sep {
   width: 2px; height: 24px;
