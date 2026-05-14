@@ -224,7 +224,7 @@ function initGenerator() {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     let rand = '';
     for (let i = 0; i < 8; i++) rand += chars[Math.floor(Math.random() * chars.length)];
-    document.getElementById('gen-id').value = `bday-${rand}`;
+    document.getElementById('gen-id').value = `retro-${rand}`;
   });
 
   // Generate link

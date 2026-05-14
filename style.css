@@ -120,6 +120,7 @@ body {
   flex-direction: column;
   z-index: 10;
   padding: 16px;
+  overflow-y: auto;
 }
 .stage.active {
   display: flex;
@@ -520,9 +521,10 @@ body {
 
 .stage5-dialog {
   width: min(560px, 94vw);
-  max-height: calc(100vh - 80px);
+  max-height: calc(100% - 60px);
   display: flex;
   flex-direction: column;
+  margin: auto 0; /* Keeps it centered but allows scroll from top if too long */
 }
 
 .stage5-body {
@@ -594,6 +596,10 @@ body {
   .stage2-question { font-size: 1.2rem; }
   .stage5-notepad  { font-size: 1.1rem; padding: 12px 14px; }
   .win-body        { padding: 14px 16px; }
+  
+  /* Specifically for stage 5 mobile when long text exists */
+  .stage5-dialog   { max-height: 75%; margin-top: 10px; }
+  #stage5-secret-btn-wrap { margin-bottom: 20px; }
 }
 
 /* ═══════════════════════════════════════════════
