@@ -41,6 +41,7 @@ var index_default = {
     const isAllowedOrigin = (req) => {
       const o = req.headers.get('Origin') || '';
       const allowed = [
+        'https://retro.for-you-always.my.id',
         'https://birthday.for-you-always.my.id',
         'https://for-you-always.my.id',
         'http://localhost:5500',
@@ -208,7 +209,7 @@ var index_default = {
           success: true,
           message: 'Birthday card saved!',
           id,
-          previewUrl: `https://birthday.for-you-always.my.id/?to=${id}`,
+          previewUrl: `https://retro.for-you-always.my.id/?to=${id}`,
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -319,7 +320,7 @@ var index_default = {
 
         await env.BIRTHDAY_DATA.put(customId, JSON.stringify(initialConfig));
 
-        const domainUrl = 'https://birthday.for-you-always.my.id';
+        const domainUrl = 'https://retro.for-you-always.my.id';
         return new Response(JSON.stringify({
           success: true,
           id: customId,
@@ -362,7 +363,7 @@ var index_default = {
         await env.BIRTHDAY_DATA.put(newId, JSON.stringify(data));
         await env.BIRTHDAY_DATA.delete(oldId);
 
-        const domainUrl = 'https://birthday.for-you-always.my.id';
+        const domainUrl = 'https://retro.for-you-always.my.id';
         return new Response(JSON.stringify({
           success: true, id: newId,
           studioUrl: `${domainUrl}/studio/${newId}`,
