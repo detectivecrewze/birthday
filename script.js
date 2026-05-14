@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let giftId = params.get('to');
   if (!giftId) {
     const path = window.location.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
-    if (path.length > 0 && (path[0].startsWith('retro-') || path[0].startsWith('bday-'))) {
+    if (path.length > 0) {
       giftId = path[0];
     }
   }

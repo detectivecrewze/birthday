@@ -1,9 +1,7 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/studio/retro-:path", "destination": "/studio/index.html" },
-    { "source": "/studio/bday-:path", "destination": "/studio/index.html" },
-    { "source": "/retro-:path", "destination": "/index.html" },
-    { "source": "/bday-:path", "destination": "/index.html" }
+    { "source": "/studio/:id", "destination": "/studio/index.html" },
+    { "source": "/:id", "destination": "/index.html" }
   ]
 }
