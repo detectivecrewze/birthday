@@ -47,11 +47,9 @@ const Autosave = (() => {
   }
 
   function _setSaveStatus(text, hide = false) {
-    const el = document.getElementById('save-status');
-    if (!el) return;
-    if (hide) { el.style.opacity = '0'; return; }
-    el.textContent = text;
-    el.style.opacity = '1';
+    // Disabled to prevent layout breakage on small mobile screens
+    // The autosave will happen silently in the background
+    return;
   }
 
   function buildState() {
