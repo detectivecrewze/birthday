@@ -65,7 +65,7 @@ const Publisher = (() => {
 
       if (data.success) {
         Autosave.cancel();
-        const url = `https://retro.for-you-always.my.id/${encodeURIComponent(token)}`;
+        const url = `https://retro.for-you-always.my.id/?to=${encodeURIComponent(token)}`;
         _showSuccessModal(url);
       } else {
         throw new Error(data.error || 'Server error');
