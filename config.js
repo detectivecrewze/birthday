@@ -1,7 +1,15 @@
 /**
  * config.js — Demo / Standalone config for Birthday Retro
+ *
+ * ─── MAINTENANCE MODE ───────────────────────────────────────
+ * Set `maintenanceMode: true` untuk menutup halaman utama.
+ * Pengunjung tanpa parameter ?to= akan melihat halaman maintenance.
+ * Link dengan ?to=xxx tetap berjalan normal.
+ * ────────────────────────────────────────────────────────────
  */
 window.BIRTHDAY_CONFIG = {
+  maintenanceMode: true,   // ← Ganti ke true untuk menutup halaman publik
+
   recipientName: 'Kamu',
   age: '20',
   stage1_heading: 'Happy 20th Birthday!',

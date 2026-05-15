@@ -123,8 +123,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Check for ?to= parameter → load from Worker
   const params = new URLSearchParams(window.location.search);
-  const giftId = params.get('to');
+  const giftId = params.get('to') || params.get('token') || params.get('id');
   let cfg = window.BIRTHDAY_CONFIG || {};
+
+  // ── MAINTENANCE MODE CHECK ───────────────────────────────────
+  // Jika maintenanceMode: true di config.js DAN tidak ada token di URL
+  // → tampilkan halaman maintenance, hentikan semua eksekusi
+  if (cfg.maintenanceMode === true && !giftId) {
+    const overlay = document.getElementById('maintenance-overlay');
+    if (overlay) overlay.style.display = 'flex';
+    return; // Stop — tidak ada yang dijalankan lebih lanjut
+  }
+  // ────────────────────────────────────────────────────────────
 
   if (giftId) {
     try {
