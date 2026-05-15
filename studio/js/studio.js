@@ -467,31 +467,61 @@ const Studio = (() => {
 
     _mediaList.forEach((item, idx) => {
       const isVideo = /\.(mp4|webm|mov|ogg)/i.test(item.url);
+      const isFirst = idx === 0;
+      const isLast  = idx === _mediaList.length - 1;
+
       const div = document.createElement('div');
       div.style.display = 'flex';
       div.style.alignItems = 'center';
-      div.style.gap = '8px';
+      div.style.gap = '6px';
       div.style.background = '#fff';
       div.style.border = '2px inset #d4d0c8';
-      div.style.padding = '8px';
+      div.style.padding = '6px 8px';
       
       div.innerHTML = `
-        <div style="width:48px;height:48px;flex-shrink:0;background:#000;border:2px inset #fff;border-color:#808080 #fff #fff #808080;">
+        <!-- Reorder arrows -->
+        <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0;">
+          <button data-up="${idx}" class="win-btn" style="min-width:24px;padding:0 4px;font-size:0.7rem;line-height:1.4;${isFirst ? 'opacity:0.3;cursor:default;' : ''}" title="Geser ke atas" ${isFirst ? 'disabled' : ''}>▲</button>
+          <button data-down="${idx}" class="win-btn" style="min-width:24px;padding:0 4px;font-size:0.7rem;line-height:1.4;${isLast ? 'opacity:0.3;cursor:default;' : ''}" title="Geser ke bawah" ${isLast ? 'disabled' : ''}>▼</button>
+        </div>
+        <!-- Thumbnail -->
+        <div style="width:44px;height:44px;flex-shrink:0;background:#000;border:2px inset #fff;border-color:#808080 #fff #fff #808080;position:relative;">
           ${isVideo
           ? `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;">▶</div>`
           : `<img src="${item.url}" alt="" style="width:100%;height:100%;object-fit:cover;">`
         }
+          <span style="position:absolute;bottom:1px;right:2px;font-size:0.55rem;background:rgba(0,0,0,0.6);color:#fff;padding:0 2px;border-radius:1px;">${idx + 1}</span>
         </div>
+        <!-- Caption input -->
         <input type="text" maxlength="60" placeholder="Caption..." value="${item.caption || ''}" class="win-input" style="flex:1;" data-idx="${idx}">
-        <button data-remove="${idx}" class="win-btn" style="min-width:32px; font-weight:bold; color:red;">✕</button>
+        <!-- Delete -->
+        <button data-remove="${idx}" class="win-btn" style="min-width:28px;font-weight:bold;color:red;flex-shrink:0;">✕</button>
       `;
 
+      // Caption
       const captionInput = div.querySelector(`input[data-idx="${idx}"]`);
       captionInput?.addEventListener('input', (e) => {
         _mediaList[idx].caption = e.target.value;
         Autosave.trigger();
       });
 
+      // Move up
+      div.querySelector(`[data-up="${idx}"]`)?.addEventListener('click', () => {
+        if (idx === 0) return;
+        [_mediaList[idx - 1], _mediaList[idx]] = [_mediaList[idx], _mediaList[idx - 1]];
+        _renderGallery();
+        Autosave.trigger();
+      });
+
+      // Move down
+      div.querySelector(`[data-down="${idx}"]`)?.addEventListener('click', () => {
+        if (idx >= _mediaList.length - 1) return;
+        [_mediaList[idx], _mediaList[idx + 1]] = [_mediaList[idx + 1], _mediaList[idx]];
+        _renderGallery();
+        Autosave.trigger();
+      });
+
+      // Delete
       div.querySelector(`[data-remove="${idx}"]`)?.addEventListener('click', () => {
         _showWinConfirm('Are you sure you want to delete this media?', () => {
           _mediaList.splice(idx, 1);
