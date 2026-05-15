@@ -345,17 +345,41 @@ const Studio = (() => {
       if (e.key === 'Enter') _applyGif(customUrl.value.trim());
     });
 
-    function _renderGifGrid(template, stage, selectedUrl) {
-      grid.innerHTML = '';
-      const lib  = (typeof GIF_LIBRARY !== 'undefined') ? GIF_LIBRARY : {};
-      const gifs = lib[template] || []; // flat array of URL strings
+    const searchInput = document.getElementById('gif-picker-search-input');
+    const searchBtn = document.getElementById('btn-gif-picker-search');
 
-      if (!gifs.length) {
-        grid.innerHTML = '<p class="gif-picker-empty">Belum ada GIF untuk template ini.</p>';
+    searchBtn?.addEventListener('click', () => {
+      const query = searchInput?.value.trim();
+      if (query) _searchTenor(query, customUrl?.value.trim() || '');
+    });
+
+    searchInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const query = searchInput.value.trim();
+        if (query) _searchTenor(query, customUrl?.value.trim() || '');
+      }
+    });
+
+    async function _searchTenor(query, selectedUrl) {
+      grid.innerHTML = '<p class="gif-picker-empty">Mencari GIF...</p>';
+      try {
+        // Using a public Tenor API key for demo purposes. In production, consider a custom API route or key.
+        const res = await fetch(`https://g.tenor.com/v1/search?q=${encodeURIComponent(query)}&key=LIVDSRZULELA&limit=20`);
+        const data = await res.json();
+        const urls = data.results.map(item => item.media[0].gif.url);
+        _renderGridItems(urls, selectedUrl);
+      } catch (e) {
+        grid.innerHTML = '<p class="gif-picker-empty">Gagal mengambil data dari Tenor. Coba lagi nanti.</p>';
+      }
+    }
+
+    function _renderGridItems(urls, selectedUrl) {
+      grid.innerHTML = '';
+      if (!urls.length) {
+        grid.innerHTML = '<p class="gif-picker-empty">GIF tidak ditemukan.</p>';
         return;
       }
-
-      gifs.forEach(url => {
+      urls.forEach(url => {
         const item = document.createElement('div');
         item.className = 'gif-picker-item' + (url === selectedUrl ? ' selected' : '');
         item.innerHTML = `<img class="gif-picker-img" src="${url}" alt="GIF" loading="lazy">`;
@@ -366,6 +390,13 @@ const Studio = (() => {
         });
         grid.appendChild(item);
       });
+    }
+
+    function _renderGifGrid(template, stage, selectedUrl) {
+      if (searchInput) searchInput.value = ''; // Reset search input on open
+      const lib  = (typeof GIF_LIBRARY !== 'undefined') ? GIF_LIBRARY : {};
+      const gifs = lib[template] || []; // flat array of URL strings
+      _renderGridItems(gifs, selectedUrl);
     }
 
     function _applyGif(url) {

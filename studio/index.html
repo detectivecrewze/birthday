@@ -370,9 +370,13 @@
       </div>
       <div class="win-menubar" style="font-size:0.85rem; color:#555;">Klik GIF untuk memilih. Scroll untuk melihat lebih banyak.</div>
       <div style="background:#ffffcc; border:1px solid #808000; padding:6px 10px; margin:8px 12px 0; font-size:0.85rem; color:#404000;">
-        💡 <strong>Tips:</strong> Cari GIF lainnya di <a href="https://tenor.com/" target="_blank" style="color:#0000ff;">Tenor.com</a>. Pastikan pilih <strong>"Copy GIF Address"</strong> (bukan link halaman) jika ingin memakai URL sendiri.
+        💡 <strong>Live Search:</strong> Ketik kata kunci (contoh: "cat cry", "birthday") lalu tekan <strong>Enter</strong> atau klik Cari.
       </div>
-      <div style="padding:12px; overflow-y:auto; flex:1;">
+      <div style="padding:12px; display:flex; gap:6px;">
+        <input id="gif-picker-search-input" type="text" class="win-input" placeholder="Cari GIF di Tenor..." style="flex:1;">
+        <button id="btn-gif-picker-search" class="win-btn" style="min-width:60px;">🔍 Cari</button>
+      </div>
+      <div style="padding:0 12px 12px 12px; overflow-y:auto; flex:1;">
         <div id="gif-picker-grid" class="gif-picker-grid"></div>
         <div style="margin-top:12px; border-top:1px solid #808080; padding-top:10px;">
           <p style="font-size:0.9rem; margin-bottom:6px;">✏️ Atau pakai URL GIF sendiri:</p>
