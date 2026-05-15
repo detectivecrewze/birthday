@@ -44,6 +44,86 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
+   DESKTOP ICONS (DECORATIVE)
+═══════════════════════════════════════════════ */
+#desktop-icons {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 36px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 24px 16px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.desktop-icon {
+  width: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  pointer-events: auto;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.desktop-icon .icon-img {
+  font-size: 38px;
+  line-height: 1;
+  filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.5));
+}
+
+.desktop-icon .icon-text {
+  font-family: var(--font);
+  font-size: 1.05rem;
+  color: white;
+  text-shadow: 1px 1px 0px black;
+  background: transparent;
+  padding: 2px 4px;
+  word-break: break-word;
+  line-height: 1.1;
+  border: 1px dotted transparent;
+}
+
+.desktop-icon:hover .icon-img {
+  filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.5)) brightness(1.1);
+}
+
+.desktop-icon:focus {
+  outline: none;
+}
+.desktop-icon:focus .icon-img {
+  filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.5)) opacity(0.8);
+}
+.desktop-icon:focus .icon-text {
+  background: #000080;
+  border-color: white;
+}
+
+@media (max-width: 480px) {
+  #desktop-icons {
+    padding: 12px;
+    gap: 16px 12px;
+  }
+  .desktop-icon {
+    width: 68px;
+  }
+  .desktop-icon .icon-img {
+    font-size: 32px;
+  }
+  .desktop-icon .icon-text {
+    font-size: 0.95rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════
    TASKBAR
 ═══════════════════════════════════════════════ */
 #taskbar {
@@ -121,6 +201,7 @@ body {
   z-index: 10;
   padding: 16px;
   overflow-y: auto;
+  background: transparent !important;
 }
 .stage.active {
   display: flex;
