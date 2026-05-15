@@ -294,6 +294,15 @@
           </fieldset>
         </div>
 
+        <!-- ── Request Link Pribadi ── -->
+        <div style="margin-bottom: 16px;">
+          <fieldset class="studio-section" style="background: rgba(147, 112, 219, 0.1); border-color: #9370db;">
+            <legend style="font-weight: bold; color: #6a0dad;">🔗 Link Pribadi (Standalone)</legend>
+            <p style="font-size: 0.9rem; margin-bottom: 8px;">Dapatkan link kado dengan <strong>domain sendiri</strong> (contoh: <code>nama-kamu.vercel.app</code>). Jadikan kado ini kenangan abadi dengan link eksklusif yang cuma milik kalian berdua! ✨</p>
+            <button id="btn-request-standalone" class="win-btn" style="font-weight: bold; background: #e6d5f5; color: #4a0080;">🔗 Request Link Pribadi (+7K)</button>
+          </fieldset>
+        </div>
+
         <!-- ── Actions ── -->
         <div class="studio-actions" style="display:flex; gap:12px;">
           <button id="btn-preview" class="win-btn win-btn-primary">▶️ Preview Card</button>
@@ -356,6 +365,43 @@
           <button id="btn-copy-link" class="win-btn">📋 Salin Link</button>
           <a id="btn-view-gift" href="#" target="_blank" class="win-btn" style="text-decoration:none; color:inherit; display:flex; align-items:center;">👁 Buka</a>
           <button id="btn-download-qr" class="win-btn">💾 Download QR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL: REQUEST LINK PRIBADI ═══ -->
+  <div id="modal-standalone" class="screen-overlay hidden">
+    <div class="win-dialog" style="width:420px; max-width:95vw;">
+      <div class="win-titlebar" style="background: linear-gradient(90deg, #4a0080 0%, #7b2fbe 100%);">
+        <span class="win-title-text">🔗 Request Link Pribadi</span>
+        <span class="win-controls" id="btn-close-standalone" style="cursor:pointer;">✕</span>
+      </div>
+      <div class="win-body" style="padding:20px;">
+        <!-- Step 1: Input domain -->
+        <div id="standalone-step1">
+          <p style="margin-bottom:10px; font-size:0.95rem;">Masukkan nama domain yang kamu inginkan:</p>
+          <div style="display:flex; align-items:center; gap:0; margin-bottom:8px;">
+            <input id="standalone-domain" type="text" class="win-input" placeholder="nama-kamu" maxlength="30" style="flex:1; border-right:none; text-align:right; padding-right:2px;">
+            <span style="background:#d4d0c8; padding:5px 8px; font-family:monospace; font-size:1.1rem; box-shadow:var(--sink); white-space:nowrap;">.vercel.app</span>
+          </div>
+          <p style="font-size:0.8rem; color:#808080; margin-bottom:12px;">Hanya huruf kecil, angka, dan strip (-). Contoh: <code>kado-untuk-desy</code></p>
+          <p id="standalone-error" class="hidden" style="color:red; font-size:0.9rem; margin-bottom:8px;"></p>
+          <button id="btn-standalone-submit" class="win-btn" style="width:100%; font-weight:bold; background:#e6d5f5; color:#4a0080;">Kirim Request</button>
+        </div>
+        <!-- Step 2: Loading -->
+        <div id="standalone-step2" class="hidden" style="text-align:center;">
+          <p style="font-size:1.1rem; margin-bottom:10px;">Mengirim data...</p>
+          <div style="background:#d4d0c8; box-shadow:var(--sink); height:20px; margin:10px 0;">
+            <div id="standalone-progress" style="background:linear-gradient(90deg,#4a0080,#7b2fbe); height:100%; width:0%; transition:width 0.5s;"></div>
+          </div>
+        </div>
+        <!-- Step 3: Success -->
+        <div id="standalone-step3" class="hidden">
+          <p style="font-size:1.1rem; font-weight:bold; color:green; margin-bottom:10px;">✅ Request berhasil dikirim!</p>
+          <p style="font-size:0.95rem; margin-bottom:6px;">Domain: <code id="standalone-result-domain"></code></p>
+          <p style="font-size:0.9rem; margin-bottom:14px; color:#555;">Data konfigurasi sudah terkirim ke admin. Selanjutnya, <strong>hubungi admin via WhatsApp</strong> untuk konfirmasi pembayaran:</p>
+          <a id="btn-standalone-wa" href="#" target="_blank" class="win-btn" style="display:block; text-align:center; font-weight:bold; background:#25d366; color:#fff; text-decoration:none; padding:8px 16px; font-size:1.1rem;">💬 Hubungi Admin via WhatsApp</a>
         </div>
       </div>
     </div>

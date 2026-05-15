@@ -138,6 +138,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {
       console.warn('[RetroGift] Failed to load config from Worker:', e);
     }
+  } else {
+    // Attempt to load standalone config (data.js) dynamically
+    try {
+      const script = document.createElement('script');
+      script.src = 'data.js';
+      document.head.appendChild(script);
+      
+      await new Promise((resolve) => {
+        script.onload = resolve;
+        script.onerror = resolve; // Ignore error (404) if not present
+      });
+
+      if (typeof GIFT_CONFIG !== 'undefined') {
+        cfg = { ...cfg, ...GIFT_CONFIG };
+      }
+    } catch (e) {
+      // Ignored
+    }
   }
 
   function applyTheme(theme) {

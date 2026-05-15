@@ -514,6 +514,77 @@ var index_default = {
     }
 
     // ══════════════════════════════════════════════════════
+    //  POST /request-standalone — Send config to Telegram
+    // ══════════════════════════════════════════════════════
+    if (request.method === 'POST' && url.pathname === '/request-standalone') {
+      if (!isAllowedOrigin(request)) {
+        return new Response(JSON.stringify({ error: 'Akses ditolak.' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      try {
+        const body = await request.json();
+        const domain = body.domain?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+        const config = body.config;
+
+        if (!domain || domain.length < 3) {
+          return new Response(JSON.stringify({ success: false, error: 'Domain minimal 3 karakter.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        if (!config) {
+          return new Response(JSON.stringify({ success: false, error: 'Config data required.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Format config as data.js content
+        const dataJsContent = `// Standalone Config — ${domain}.vercel.app\n// Generated: ${new Date().toISOString()}\n\nconst GIFT_CONFIG = ${JSON.stringify(config, null, 2)};\n`;
+
+        // Send to Telegram
+        const botToken = env.TELEGRAM_BOT_TOKEN;
+        const chatId = env.TELEGRAM_CHAT_ID;
+
+        if (!botToken || !chatId) {
+          return new Response(JSON.stringify({ success: false, error: 'Telegram not configured on server.' }), {
+            status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Send text notification first
+        const notifText = `📦 REQUEST LINK PRIBADI\n\nDomain: ${domain}.vercel.app\nRecipient: ${config.recipientName || '—'}\nTemplate: ${config.template || 'birthday'}\nTimestamp: ${new Date().toISOString()}`;
+
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: notifText }),
+        });
+
+        // Send data.js as document
+        const blob = new Blob([dataJsContent], { type: 'application/javascript' });
+        const formData = new FormData();
+        formData.append('chat_id', chatId);
+        formData.append('document', blob, `data_${domain}.js`);
+        formData.append('caption', `data.js untuk ${domain}.vercel.app`);
+
+        await fetch(`https://api.telegram.org/bot${botToken}/sendDocument`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        return new Response(JSON.stringify({
+          success: true,
+          domain: `${domain}.vercel.app`,
+          message: 'Request berhasil dikirim ke admin.',
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      } catch (error) {
+        return new Response(JSON.stringify({ success: false, error: error.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ══════════════════════════════════════════════════════
     //  BUNDLE SYSTEM — Token-based reseller link generator
     // ══════════════════════════════════════════════════════
 

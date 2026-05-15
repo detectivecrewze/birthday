@@ -18,6 +18,28 @@ const Publisher = (() => {
       window.open(`https://wa.me/6281381543981?text=${waMsg}`, '_blank');
     });
 
+    // ── Standalone Request ──────────────────────────────────────
+    document.getElementById('btn-request-standalone')?.addEventListener('click', () => {
+      // Reset modal state
+      document.getElementById('standalone-step1').classList.remove('hidden');
+      document.getElementById('standalone-step2').classList.add('hidden');
+      document.getElementById('standalone-step3').classList.add('hidden');
+      document.getElementById('standalone-error').classList.add('hidden');
+      document.getElementById('standalone-domain').value = '';
+      document.getElementById('standalone-progress').style.width = '0%';
+      document.getElementById('modal-standalone').classList.remove('hidden');
+    });
+
+    document.getElementById('btn-close-standalone')?.addEventListener('click', () => {
+      document.getElementById('modal-standalone').classList.add('hidden');
+    });
+
+    document.getElementById('btn-standalone-submit')?.addEventListener('click', _handleStandaloneSubmit);
+
+    document.getElementById('standalone-domain')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') _handleStandaloneSubmit();
+    });
+
     // Success modal
     document.getElementById('btn-copy-link')?.addEventListener('click', _handleCopyLink);
     document.getElementById('btn-close-success')?.addEventListener('click', () => _toggleModal('modal-success', false));
@@ -171,6 +193,68 @@ const Publisher = (() => {
         setTimeout(() => btn.textContent = originalText, 2000);
       }
     }).catch(() => Studio.showToast('Gagal salin. Coba manual.'));
+  }
+  // ── Standalone Request Handler ─────────────────────────────
+  async function _handleStandaloneSubmit() {
+    const domainInput = document.getElementById('standalone-domain');
+    const error = document.getElementById('standalone-error');
+    const domain = domainInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+    error.classList.add('hidden');
+
+    if (!domain || domain.length < 3) {
+      error.textContent = 'Domain minimal 3 karakter (huruf kecil, angka, strip).';
+      error.classList.remove('hidden');
+      return;
+    }
+
+    // Show loading
+    document.getElementById('standalone-step1').classList.add('hidden');
+    document.getElementById('standalone-step2').classList.remove('hidden');
+    const progressBar = document.getElementById('standalone-progress');
+    progressBar.style.width = '30%';
+
+    try {
+      // Build current config
+      const state = Autosave.buildState();
+      state.requestedDomain = domain + '.vercel.app';
+      state.requestedAt = new Date().toISOString();
+
+      progressBar.style.width = '60%';
+
+      const res = await fetch(`${Auth.getWorkerUrl()}/request-standalone`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain, config: state }),
+      });
+      const data = await res.json();
+
+      progressBar.style.width = '100%';
+
+      if (data.success) {
+        setTimeout(() => {
+          document.getElementById('standalone-step2').classList.add('hidden');
+          document.getElementById('standalone-step3').classList.remove('hidden');
+          document.getElementById('standalone-result-domain').textContent = data.domain;
+
+          // Build WhatsApp link
+          const waMsg = encodeURIComponent(
+            `REQUEST LINK PRIBADI — RETRO GIFT (+7K)\n\n` +
+            `Domain: ${data.domain}\n` +
+            `Nama Penerima: ${state.recipientName || '—'}\n` +
+            `Template: ${state.template || 'birthday'}\n\n` +
+            `Data sudah terkirim otomatis. Mohon diproses ya, terima kasih!`
+          );
+          document.getElementById('btn-standalone-wa').href = `https://wa.me/6281381543981?text=${waMsg}`;
+        }, 500);
+      } else {
+        throw new Error(data.error || 'Gagal mengirim request.');
+      }
+    } catch (e) {
+      document.getElementById('standalone-step2').classList.add('hidden');
+      document.getElementById('standalone-step1').classList.remove('hidden');
+      error.textContent = 'Error: ' + e.message;
+      error.classList.remove('hidden');
+    }
   }
 
   return { init };
