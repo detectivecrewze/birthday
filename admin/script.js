@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initGenerator();
   initCardActions();
   initBundle();
+  initQR();
 });
 
 /* ═══════════════════════════════════════════════
@@ -410,4 +411,88 @@ async function loadBundleTokens() {
   } catch (e) {
     tbody.innerHTML = `<tr><td colspan="5" style="color:red;padding:20px;">Error: ${e.message}</td></tr>`;
   }
+}
+
+/* ═══════════════════════════════════════════════
+   QR GENERATOR
+═══════════════════════════════════════════════ */
+function initQR() {
+  const btnGenerate = document.getElementById('btn-qr-generate');
+  const inputUrl = document.getElementById('qr-input-url');
+  const resultContainer = document.getElementById('qr-result-container');
+  const qrCanvas = document.getElementById('qr-code-box'); // using the new box
+  const urlDisplay = document.getElementById('qr-url-display');
+  const btnDownload = document.getElementById('btn-qr-download');
+
+  btnGenerate?.addEventListener('click', () => {
+    const url = inputUrl.value.trim();
+    if (!url) {
+      alert('Masukkan URL domain terlebih dahulu!');
+      return;
+    }
+
+    // Clear previous
+    qrCanvas.innerHTML = '';
+    
+    // Generate new QR
+    try {
+      new QRCode(qrCanvas, {
+        text: url,
+        width: 148,
+        height: 148,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      // Fix for mobile: qrcode.js might use canvas instead of img on some devices.
+      const styleTag = document.createElement('style');
+      styleTag.textContent = '#qr-code-box img, #qr-code-box canvas { margin: 0 auto !important; display: block; }';
+      qrCanvas.appendChild(styleTag);
+
+      urlDisplay.textContent = url;
+      resultContainer.classList.remove('hidden');
+    } catch (e) {
+      alert('Error generating QR code: ' + e.message);
+    }
+  });
+
+  btnDownload?.addEventListener('click', async () => {
+    const exportNode = document.getElementById('qr-export-container');
+    if (!exportNode || typeof html2canvas === 'undefined') {
+      alert('html2canvas belum termuat atau error.');
+      return;
+    }
+
+    const originalText = btnDownload.innerHTML;
+    btnDownload.innerHTML = 'Menyiapkan...';
+    btnDownload.style.opacity = '0.7';
+    btnDownload.disabled = true;
+
+    try {
+      const canvas = await html2canvas(exportNode, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: '#fff',
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `QR_${urlDisplay.textContent.replace(/[^a-z0-9]/gi, '_')}.png`;
+      link.href = imgData;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error('Error generating QR PNG:', err);
+      alert('Gagal mendownload barcode.');
+    } finally {
+      requestAnimationFrame(() => {
+        btnDownload.innerHTML = originalText;
+        btnDownload.style.opacity = '1';
+        btnDownload.disabled = false;
+      });
+    }
+  });
 }

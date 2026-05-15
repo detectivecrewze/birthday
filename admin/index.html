@@ -27,6 +27,7 @@
         <button class="tab-btn active" data-tab="cards">📋 Cards</button>
         <button class="tab-btn" data-tab="generator">🔗 Generator</button>
         <button class="tab-btn" data-tab="bundle">📦 Bundle</button>
+        <button class="tab-btn" data-tab="qr">🔲 QR Code</button>
       </div>
     </div>
 
@@ -179,6 +180,62 @@
 
   </div><!-- /dashboard -->
 
+    <!-- ═══ TAB: QR Code ═══ -->
+    <div id="tab-qr" class="tab-panel">
+      <div class="panel-window">
+        <div class="win-titlebar"><span class="win-title-text">🔲 QR Code Generator</span></div>
+        <div class="win-body" style="padding:20px;">
+          <fieldset class="gen-section">
+            <legend>🌐 Generate QR from URL</legend>
+            <div class="field-row">
+              <label>Domain URL:</label>
+              <input id="qr-input-url" type="text" class="win-input" placeholder="https://nama-kamu.vercel.app" style="flex:1;">
+            </div>
+            <button id="btn-qr-generate" class="win-btn win-btn-primary" style="margin-top:10px;">Generate Barcode</button>
+            
+            <div id="qr-result-container" class="hidden" style="margin-top:24px; text-align:center;">
+              <!-- ═══ Aesthetic Retro QR Code ═══ -->
+              <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+                <div id="qr-export-container"
+                  style="background-color: #d4d0c8; padding: 4px; border: 2px solid; border-color: #dfdfdf #808080 #808080 #dfdfdf; position: relative; max-width: 220px; width: 100%; box-sizing: border-box; text-align:left;">
+                  
+                  <!-- Inner border for Win98 double border effect -->
+                  <div style="border: 1px solid; border-color: #ffffff #404040 #404040 #ffffff; padding: 6px;">
+                    
+                    <!-- Title bar -->
+                    <div style="background: linear-gradient(90deg, #000082 0%, #1b5fd9 100%); padding: 2px 4px; display: flex; justify-content: space-between; align-items: center; color: white; font-family: 'VT323', 'Courier New', monospace; font-size: 1.1rem; margin-bottom: 8px;">
+                      <span style="display:flex; align-items:center; gap:4px; color:white;">🎁 barcode.exe</span>
+                      <span style="font-size:0.9rem; letter-spacing:1px; margin-right:2px; color:white;">─ □ ✕</span>
+                    </div>
+
+                    <div style="text-align: center;">
+                      <p style="font-family: 'VT323', 'Courier New', monospace; font-size: 1.2rem; color: #000000 !important; margin-bottom: 10px; text-shadow: 1px 1px 0 #ffffff;">
+                        Scan to Open Gift!
+                      </p>
+                      
+                      <!-- QR Code -->
+                      <div id="qr-code-box"
+                        style="background-color: #ffffff !important; padding: 8px; display: flex; justify-content: center; align-items: center; min-height: 148px; width: 148px; margin: 0 auto; border: 2px solid; border-color: #808080 #dfdfdf #dfdfdf #808080;">
+                      </div>
+                      
+                      <!-- Bottom text -->
+                      <p style="font-family: 'VT323', 'Courier New', monospace; font-size: 1.1rem; color: #404040 !important; margin-top: 10px; text-transform: uppercase;">
+                        RETRO GIFT
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p id="qr-url-display" style="margin-bottom:12px; font-family:monospace; font-size:0.9rem; word-break:break-all;"></p>
+              <button id="btn-qr-download" class="win-btn" style="font-weight:bold;">⬇️ Download QR (.png)</button>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dashboard wrapper (if needed) -->
+
   <!-- ═══ LOGIN SCREEN (Shows first) ═══ -->
   <div id="login-screen" class="screen-overlay">
     <div class="win-dialog" style="width:360px;">
@@ -194,6 +251,8 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
