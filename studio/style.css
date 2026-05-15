@@ -62,7 +62,7 @@ body {
 }
 .titlebar-error { background: var(--titlebar-error); }
 .win-title-text { flex: 1; }
-.win-controls { font-size: 0.9rem; letter-spacing: 2px; pointer-events: none; }
+.win-controls { font-size: 0.9rem; letter-spacing: 2px; }
 .win-menubar {
   background: var(--gray);
   font-family: var(--font);
