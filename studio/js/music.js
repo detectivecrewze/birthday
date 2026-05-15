@@ -472,5 +472,66 @@ const Music = (() => {
     return playlist.some(t => t.uploading);
   }
 
-  return { init, fetchKurasi, getPlaylistArray, isUploading, setPremiumMode };
+  // ── Library Preview (Free User — semua lagu locked) ─────────
+  function openLibraryPreview() {
+    document.getElementById('music-library-modal')?.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'music-library-modal';
+    modal.className = 'screen-overlay';
+    modal.style.zIndex = '200';
+    modal.innerHTML = `
+    <div class="win-dialog" style="width:400px; max-height:85vh; display:flex; flex-direction:column;">
+      <div class="win-titlebar">
+        <span class="win-title-text">🎵 Song Library</span>
+        <button id="library-modal-close" class="win-controls" style="background:none;border:none;color:#fff;cursor:pointer;">✕</button>
+      </div>
+      <div class="win-body" style="padding:10px; display:flex; flex-direction:column; flex:1; overflow:hidden;">
+        <div style="background:#fff3cd; border:1px solid #ffc107; padding:8px 10px; margin-bottom:10px; font-size:0.8rem;">
+          🔒 <strong>Fitur Premium</strong> — Upgrade ke <strong>Premium</strong> untuk bebas memilih lagu dari koleksi kami atau <strong>Upload MP3 kamu sendiri</strong> ke dalam kado.
+        </div>
+        <p style="margin-bottom:8px;">Koleksi lagu yang tersedia (Premium):</p>
+        <div id="library-songs-list" style="flex:1; overflow-y:auto; border:2px solid #808080; background:#fff; padding:2px; box-shadow:var(--sink);">
+          <div style="padding:20px; text-align:center;">Loading...</div>
+        </div>
+        <div style="margin-top:12px; text-align:right;">
+          <button id="library-back-btn" class="win-btn">Tutup</button>
+        </div>
+      </div>
+    </div>`;
+    document.body.appendChild(modal);
+
+    const closeModal = () => modal.remove();
+    modal.querySelector('#library-modal-close')?.addEventListener('click', closeModal);
+    modal.querySelector('#library-back-btn')?.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+    const renderPreview = (songs) => {
+      const list = modal.querySelector('#library-songs-list');
+      if (!songs || songs.length === 0) {
+        list.innerHTML = `<div style="padding:20px; text-align:center;">Playlist kosong</div>`;
+        return;
+      }
+      list.innerHTML = songs.map((song, i) => `
+        <div class="library-song-item" style="display:flex; align-items:center; gap:8px; padding:6px; border-bottom:1px solid #ccc; opacity:0.65; cursor:not-allowed;" title="Fitur Premium">
+          <button class="win-btn" style="min-width:30px; padding:2px;" disabled>🔒</button>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${song.title}</div>
+            <div style="font-size:0.85rem; color:#404040;">${song.artist}</div>
+          </div>
+        </div>`).join('');
+
+      list.querySelectorAll('.library-song-item').forEach(item => {
+        item.addEventListener('click', () => Studio.showToast('🔒 Upgrade ke Premium untuk memilih lagu!'));
+      });
+    };
+
+    if (_kurasiFetched && _kurasiData.length > 0) {
+      renderPreview(_kurasiData);
+    } else {
+      fetchKurasi().then(() => renderPreview(_kurasiData));
+    }
+  }
+
+  return { init, fetchKurasi, getPlaylistArray, isUploading, setPremiumMode, openLibraryPreview };
 })();

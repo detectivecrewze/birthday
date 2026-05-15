@@ -221,8 +221,16 @@
         </fieldset>
 
         <!-- ── Section 4: Music ── -->
-        <fieldset class="studio-section" id="section-music">
+        <fieldset class="studio-section" id="section-music" style="position: relative;">
           <legend>🎵 Musik / Lagu (Max 3)</legend>
+
+          <div id="music-lock-overlay" class="hidden" style="position: absolute; inset: 0; background: rgba(212,208,200,0.88); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; border-radius: 4px; box-shadow: var(--raise); margin: 8px; gap: 6px;">
+            <span style="font-size: 1.5rem; text-shadow: 1px 1px 0 #fff;">🔒</span>
+            <span style="font-weight: bold; font-size: 1rem; color: #000; text-shadow: 1px 1px 0 #fff;">Fitur Premium</span>
+            <span style="font-size: 0.75rem; color: #444; text-shadow: 1px 1px 0 #fff; text-align:center; padding: 0 12px;">Upgrade ke Premium untuk <b>pilih lagu dari Library</b> atau <b>Upload file MP3 kamu sendiri</b>.</span>
+            <button id="btn-music-preview-library" class="win-btn" style="margin-top:4px; font-size:0.75rem;">👀 Lihat Library</button>
+          </div>
+
           <div id="music-slots-container"></div>
           <p class="field-hint" style="margin-top: 8px;">Pilih lagu kesukaannya. Bagian ini opsional — jika dikosongkan, musik tidak akan diputar.</p>
         </fieldset>

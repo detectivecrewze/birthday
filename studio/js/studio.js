@@ -206,6 +206,18 @@ const Studio = (() => {
       if (hintInput) hintInput.disabled = false;
     }
 
+    // Music & Premium Lock
+    const musicOverlay = document.getElementById('music-lock-overlay');
+    if (!_isPremium) {
+      if (musicOverlay) musicOverlay.classList.remove('hidden');
+      // Tombol "Lihat Library" — buka modal library dalam mode preview-only (semua locked)
+      document.getElementById('btn-music-preview-library')?.addEventListener('click', () => {
+        if (typeof Music !== 'undefined') Music.openLibraryPreview();
+      });
+    } else {
+      if (musicOverlay) musicOverlay.classList.add('hidden');
+    }
+
     // Auto-generate heading when name/age changes
     const nameInput = document.getElementById('input-recipient-name');
     const ageInput = document.getElementById('input-age');
