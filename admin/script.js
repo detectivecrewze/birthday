@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initGenerator();
   initCardActions();
+  initBundle();
 });
 
 /* ═══════════════════════════════════════════════
@@ -294,4 +295,119 @@ function initGenerator() {
       result.classList.remove('hidden');
     }
   });
+}
+
+/* ═══════════════════════════════════════════════
+   BUNDLE
+═══════════════════════════════════════════════ */
+function initBundle() {
+  // Auto-generate token name
+  document.getElementById('btn-bundle-auto')?.addEventListener('click', () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let rand = '';
+    for (let i = 0; i < 8; i++) rand += chars[Math.floor(Math.random() * chars.length)];
+    document.getElementById('bundle-token-name').value = `bundle-${rand}`;
+  });
+
+  // Create token
+  document.getElementById('btn-bundle-create')?.addEventListener('click', async () => {
+    const tokenName = document.getElementById('bundle-token-name').value.trim();
+    const maxLinks = parseInt(document.getElementById('bundle-max-links').value) || 5;
+    const error = document.getElementById('bundle-create-error');
+    const result = document.getElementById('bundle-create-result');
+    error.classList.add('hidden');
+    result.classList.add('hidden');
+
+    try {
+      const res = await fetch(`${WORKER_URL}/bundle/create-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminSecret}` },
+        body: JSON.stringify({ token: tokenName || null, maxLinks }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('bundle-result-token').textContent = data.token;
+        const urlEl = document.getElementById('bundle-result-url');
+        urlEl.href = data.bundleUrl;
+        urlEl.textContent = data.bundleUrl;
+        document.getElementById('bundle-result-max').textContent = data.maxLinks;
+        result.classList.remove('hidden');
+        loadBundleTokens();
+      } else {
+        error.textContent = data.error;
+        error.classList.remove('hidden');
+      }
+    } catch (e) {
+      error.textContent = 'Error: ' + e.message;
+      error.classList.remove('hidden');
+    }
+  });
+
+  // Refresh tokens
+  document.getElementById('btn-bundle-refresh')?.addEventListener('click', loadBundleTokens);
+
+  // Delete token (event delegation)
+  document.getElementById('bundle-tbody')?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.bundle-delete-btn');
+    if (!btn) return;
+    const token = btn.dataset.token;
+    if (!confirm(`Hapus token "${token}"? Link yang sudah dibuat TIDAK akan dihapus.`)) return;
+
+    try {
+      const res = await fetch(`${WORKER_URL}/bundle/delete-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminSecret}` },
+        body: JSON.stringify({ token }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message);
+        loadBundleTokens();
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (e) {
+      alert('Error: ' + e.message);
+    }
+  });
+}
+
+async function loadBundleTokens() {
+  const tbody = document.getElementById('bundle-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;">Loading...</td></tr>';
+
+  try {
+    const res = await fetch(`${WORKER_URL}/bundle/list-tokens`, {
+      headers: { 'Authorization': `Bearer ${adminSecret}` },
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    const tokens = data.tokens || [];
+    if (tokens.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;">No bundle tokens yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = tokens.map(t => {
+      const linksList = (t.linksCreated || []).map(l =>
+        `<a href="../studio/?to=${l.id}" target="_blank">${l.id}</a> (${l.template})`
+      ).join(', ') || '—';
+
+      const createdDate = t.createdAt ? new Date(t.createdAt).toLocaleDateString('id-ID') : '—';
+
+      return `
+        <tr>
+          <td><code>${t.token}</code></td>
+          <td>${t.linksUsed} / ${t.maxLinks}</td>
+          <td>${createdDate}</td>
+          <td style="white-space:normal;max-width:250px;">${linksList}</td>
+          <td><button class="win-btn bundle-delete-btn" data-token="${t.token}" style="color:red;font-size:0.85rem;padding:2px 8px;">🗑️ Del</button></td>
+        </tr>
+      `;
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="color:red;padding:20px;">Error: ${e.message}</td></tr>`;
+  }
 }

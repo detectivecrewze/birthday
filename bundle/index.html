@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📦 Retro Gift — Bundle Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --desktop: #008080;
+      --gray:    #d4d0c8;
+      --white:   #ffffff;
+      --black:   #000000;
+      --dark:    #808080;
+      --blue:    #000082;
+      --titlebar: linear-gradient(90deg, #000082 0%, #1b5fd9 100%);
+      --font: 'VT323', 'Courier New', monospace;
+      --raise: inset -1px -1px 0 #808080, inset 1px 1px 0 #fff, inset -2px -2px 0 #404040, inset 2px 2px 0 #d4d0c8;
+      --sink:  inset 1px 1px 0 #808080, inset -1px -1px 0 #fff, inset 2px 2px 0 #404040, inset -2px -2px 0 #d4d0c8;
+    }
+
+    body {
+      background: var(--desktop);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .hidden { display: none !important; }
+
+    .win-dialog {
+      background: var(--gray);
+      box-shadow: var(--raise), 3px 3px 0 rgba(0,0,0,0.4);
+      display: flex; flex-direction: column;
+      width: min(520px, 96vw);
+    }
+    .win-titlebar {
+      background: var(--titlebar);
+      color: #fff; font-family: var(--font); font-size: 1.1rem;
+      padding: 4px 8px; display: flex; align-items: center;
+      justify-content: space-between; border-bottom: 1px solid #000;
+    }
+    .win-title-text { flex: 1; }
+    .win-controls { font-size: 0.9rem; letter-spacing: 2px; }
+    .win-body { background: var(--white); padding: 20px; }
+    .win-statusbar {
+      background: var(--gray);
+      border-top: 2px solid; border-color: #808080 #fff #fff #808080;
+      font-size: 0.85rem; padding: 3px 10px;
+    }
+    .win-btn {
+      font-family: var(--font); font-size: 1.05rem;
+      background: var(--gray); color: var(--black);
+      border: none; box-shadow: var(--raise);
+      padding: 4px 16px; cursor: pointer; min-width: 70px;
+    }
+    .win-btn:active { box-shadow: var(--sink); }
+    .win-btn-primary { background: var(--blue); color: #fff; }
+    .win-input, .win-select {
+      font-family: var(--font); font-size: 1.1rem;
+      background: var(--white); border: none;
+      box-shadow: var(--sink); padding: 4px 8px; color: var(--black);
+      width: 100%;
+    }
+    .win-input:focus { outline: 1px dotted #000; outline-offset: -2px; }
+
+    .field-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .field-row label {
+      min-width: 100px; flex-shrink: 0; font-size: 1rem;
+    }
+    .field-row .win-input, .field-row .win-select { flex: 1; }
+
+    fieldset {
+      border: 2px groove var(--gray);
+      padding: 12px 14px 14px;
+      margin-bottom: 14px;
+    }
+    fieldset legend {
+      font-size: 1.1rem; padding: 0 6px;
+    }
+
+    .quota-bar {
+      background: var(--gray); box-shadow: var(--sink);
+      height: 20px; margin: 8px 0;
+    }
+    .quota-fill {
+      background: linear-gradient(90deg, #008000, #00cc00);
+      height: 100%; transition: width 0.3s;
+    }
+    .quota-fill.warning { background: linear-gradient(90deg, #cc8800, #ffaa00); }
+    .quota-fill.full { background: linear-gradient(90deg, #cc0000, #ff2222); }
+
+    .link-card {
+      background: #f8f8f8; box-shadow: var(--sink);
+      padding: 8px 10px; margin-bottom: 6px;
+      font-size: 0.95rem; word-break: break-all;
+    }
+    .link-card a { color: var(--blue); text-decoration: underline; }
+    .link-card .link-template { color: #808080; font-size: 0.85rem; }
+
+    @media (max-width: 500px) {
+      .field-row { flex-direction: column; align-items: stretch; }
+      .field-row label { min-width: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ LOGIN SCREEN ═══ -->
+  <div id="login-screen">
+    <div class="win-dialog">
+      <div class="win-titlebar">
+        <span class="win-title-text">📦 Bundle Edition — Login</span>
+        <span class="win-controls">─ □ ✕</span>
+      </div>
+      <div class="win-body" style="text-align:center;">
+        <p style="margin-bottom:12px; font-size:1.1rem;">Masukkan Bundle Token untuk mulai membuat link.</p>
+        <input id="login-token" type="text" class="win-input" placeholder="Token..." style="text-align:center; margin-bottom:10px;">
+        <p id="login-error" class="hidden" style="color:red; font-size:0.9rem; margin-bottom:8px;"></p>
+        <button id="btn-login" class="win-btn win-btn-primary" style="width:100%;">Login</button>
+      </div>
+      <div class="win-statusbar">Retro Gift — Bundle Edition</div>
+    </div>
+  </div>
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div id="dashboard" class="hidden">
+    <div class="win-dialog">
+      <div class="win-titlebar">
+        <span class="win-title-text">📦 Bundle Dashboard</span>
+        <span class="win-controls">─ □ ✕</span>
+      </div>
+      <div class="win-body">
+
+        <!-- Quota -->
+        <fieldset>
+          <legend>📊 Quota</legend>
+          <p style="font-size:1rem;">Token: <code id="dash-token"></code></p>
+          <p style="font-size:1rem;">Link: <span id="dash-used">0</span> / <span id="dash-max">0</span></p>
+          <div class="quota-bar"><div class="quota-fill" id="dash-quota-bar" style="width:0%;"></div></div>
+        </fieldset>
+
+        <!-- Generate Link -->
+        <fieldset id="gen-section">
+          <legend>🆕 Generate Studio Link</legend>
+          <div class="field-row">
+            <label>ID (slug):</label>
+            <div style="display:flex;gap:6px;flex:1;">
+              <input id="gen-id" type="text" class="win-input" placeholder="my-gift (opsional)" maxlength="40" style="flex:1;">
+              <button id="btn-gen-auto" class="win-btn" style="min-width:50px;">Auto</button>
+            </div>
+          </div>
+          <div class="field-row">
+            <label>Template:</label>
+            <select id="gen-template" class="win-select">
+              <option value="birthday">🎂 Birthday</option>
+              <option value="apology">💌 Apology</option>
+              <option value="general">🎁 General</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <label>Password:</label>
+            <input id="gen-password" type="text" class="win-input" placeholder="(opsional)" maxlength="20">
+          </div>
+          <button id="btn-generate" class="win-btn win-btn-primary" style="width:100%; margin-top:6px;">Generate Link</button>
+          <p id="gen-error" class="hidden" style="color:red; font-size:0.9rem; margin-top:8px;"></p>
+
+          <!-- Result -->
+          <div id="gen-result" class="hidden" style="margin-top:12px; padding:10px; background:#f0f0f0; box-shadow:var(--sink); word-break:break-all;">
+            <p><strong>✅ Link berhasil dibuat!</strong></p>
+            <p>Studio: <a id="result-studio" href="#" target="_blank"></a></p>
+            <p>Gift: <a id="result-gift" href="#" target="_blank"></a></p>
+            <p style="color:#808080; font-size:0.9rem;">Sisa: <span id="result-remaining"></span> link</p>
+          </div>
+        </fieldset>
+
+        <!-- Created Links -->
+        <fieldset>
+          <legend>📋 Link Yang Sudah Dibuat</legend>
+          <div id="links-list">
+            <p style="color:#808080; text-align:center;">Belum ada link.</p>
+          </div>
+        </fieldset>
+
+      </div>
+      <div class="win-statusbar" id="dash-status">Ready.</div>
+    </div>
+  </div>
+
+  <script>
+  'use strict';
+
+  const WORKER_URL = 'https://birthday-retro.aldoramadhan16.workers.dev';
+  let _token = '';
+  let _bundleData = null;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Check URL for pre-filled token
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get('token');
+    if (urlToken) {
+      document.getElementById('login-token').value = urlToken;
+      tryLogin();
+    }
+
+    document.getElementById('btn-login')?.addEventListener('click', tryLogin);
+    document.getElementById('login-token')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') tryLogin();
+    });
+
+    document.getElementById('btn-gen-auto')?.addEventListener('click', () => {
+      const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+      let rand = '';
+      for (let i = 0; i < 8; i++) rand += chars[Math.floor(Math.random() * chars.length)];
+      document.getElementById('gen-id').value = `retro-${rand}`;
+    });
+
+    document.getElementById('btn-generate')?.addEventListener('click', generateLink);
+  });
+
+  async function tryLogin() {
+    const input = document.getElementById('login-token');
+    const error = document.getElementById('login-error');
+    const token = input.value.trim();
+    if (!token) return;
+    error.classList.add('hidden');
+
+    try {
+      const res = await fetch(`${WORKER_URL}/bundle/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        _token = data.token;
+        _bundleData = data;
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        renderDashboard(data);
+      } else {
+        error.textContent = data.error || 'Token tidak valid.';
+        error.classList.remove('hidden');
+      }
+    } catch (e) {
+      error.textContent = 'Koneksi gagal: ' + e.message;
+      error.classList.remove('hidden');
+    }
+  }
+
+  function renderDashboard(data) {
+    document.getElementById('dash-token').textContent = data.token;
+    document.getElementById('dash-used').textContent = data.linksUsed;
+    document.getElementById('dash-max').textContent = data.maxLinks;
+
+    const pct = Math.round((data.linksUsed / data.maxLinks) * 100);
+    const bar = document.getElementById('dash-quota-bar');
+    bar.style.width = pct + '%';
+    bar.className = 'quota-fill' + (pct >= 100 ? ' full' : pct >= 75 ? ' warning' : '');
+
+    // Disable generator if at limit
+    const genSection = document.getElementById('gen-section');
+    const genBtn = document.getElementById('btn-generate');
+    if (data.linksUsed >= data.maxLinks) {
+      genBtn.disabled = true;
+      genBtn.textContent = 'Limit Tercapai';
+      document.getElementById('dash-status').textContent = 'Quota penuh. Tidak bisa membuat link baru.';
+    }
+
+    // Render existing links
+    const listEl = document.getElementById('links-list');
+    const links = data.linksCreated || [];
+    if (links.length === 0) {
+      listEl.innerHTML = '<p style="color:#808080; text-align:center;">Belum ada link.</p>';
+    } else {
+      listEl.innerHTML = links.map(l => `
+        <div class="link-card">
+          <span class="link-template">[${l.template}]</span>
+          Studio: <a href="../studio/?to=${l.id}" target="_blank">${l.id}</a> |
+          Gift: <a href="../?to=${l.id}" target="_blank">View</a>
+        </div>
+      `).join('');
+    }
+  }
+
+  async function generateLink() {
+    const id = document.getElementById('gen-id').value.trim();
+    const template = document.getElementById('gen-template').value;
+    const password = document.getElementById('gen-password').value.trim();
+    const error = document.getElementById('gen-error');
+    const result = document.getElementById('gen-result');
+    error.classList.add('hidden');
+    result.classList.add('hidden');
+
+    try {
+      const res = await fetch(`${WORKER_URL}/bundle/generate-link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: _token,
+          id: id || null,
+          template,
+          studioPassword: password || null,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const studioEl = document.getElementById('result-studio');
+        studioEl.href = data.studioUrl;
+        studioEl.textContent = data.studioUrl;
+        const giftEl = document.getElementById('result-gift');
+        giftEl.href = data.giftUrl;
+        giftEl.textContent = data.giftUrl;
+        document.getElementById('result-remaining').textContent = data.remaining;
+        result.classList.remove('hidden');
+        document.getElementById('dash-status').textContent = `Link "${data.id}" berhasil dibuat!`;
+
+        // Refresh dashboard
+        const refreshRes = await fetch(`${WORKER_URL}/bundle/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: _token }),
+        });
+        const refreshData = await refreshRes.json();
+        if (refreshData.success) renderDashboard(refreshData);
+      } else {
+        error.textContent = data.error;
+        error.classList.remove('hidden');
+      }
+    } catch (e) {
+      error.textContent = 'Error: ' + e.message;
+      error.classList.remove('hidden');
+    }
+  }
+  </script>
+</body>
+</html>

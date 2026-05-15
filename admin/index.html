@@ -26,6 +26,7 @@
       <div class="tab-bar">
         <button class="tab-btn active" data-tab="cards">📋 Cards</button>
         <button class="tab-btn" data-tab="generator">🔗 Generator</button>
+        <button class="tab-btn" data-tab="bundle">📦 Bundle</button>
       </div>
     </div>
 
@@ -119,6 +120,63 @@
         </div>
       </div>
     </div>
+
+    <!-- ═══ TAB: Bundle ═══ -->
+    <div id="tab-bundle" class="tab-panel">
+      <div class="panel-window">
+        <div class="win-titlebar"><span class="win-title-text">📦 Bundle Token Manager</span></div>
+        <div class="win-body" style="padding:20px;">
+
+          <!-- Create Token -->
+          <fieldset class="gen-section">
+            <legend>🆕 Create Bundle Token</legend>
+            <div class="field-row">
+              <label>Token Name:</label>
+              <div style="display:flex;gap:8px;flex:1;">
+                <input id="bundle-token-name" type="text" class="win-input" placeholder="(kosongkan = auto)" maxlength="30" style="flex:1;">
+                <button id="btn-bundle-auto" class="win-btn">Auto</button>
+              </div>
+            </div>
+            <div class="field-row">
+              <label>Max Links:</label>
+              <input id="bundle-max-links" type="number" class="win-input" value="5" min="1" max="100" style="width:80px;">
+            </div>
+            <button id="btn-bundle-create" class="win-btn win-btn-primary" style="margin-top:10px;">Create Token</button>
+            <div id="bundle-create-result" class="hidden" style="margin-top:12px;padding:10px;background:#f0f0f0;box-shadow:var(--sink);word-break:break-all;">
+              <p><strong>✅ Token berhasil dibuat!</strong></p>
+              <p>Token: <code id="bundle-result-token"></code></p>
+              <p>Bundle URL: <a id="bundle-result-url" href="#" target="_blank"></a></p>
+              <p>Max Links: <span id="bundle-result-max"></span></p>
+            </div>
+            <p id="bundle-create-error" class="hidden" style="color:red;font-size:0.9rem;margin-top:8px;"></p>
+          </fieldset>
+
+          <!-- Token List -->
+          <fieldset class="gen-section">
+            <legend>📊 Active Bundle Tokens</legend>
+            <button id="btn-bundle-refresh" class="win-btn" style="margin-bottom:10px;">🔄 Refresh</button>
+            <div style="overflow-x:auto;">
+              <table class="data-table" id="bundle-table">
+                <thead>
+                  <tr>
+                    <th>Token</th>
+                    <th>Usage</th>
+                    <th>Created</th>
+                    <th>Links</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bundle-tbody">
+                  <tr><td colspan="5" style="text-align:center;padding:20px;">Click Refresh to load.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </fieldset>
+
+        </div>
+      </div>
+    </div>
+
   </div><!-- /dashboard -->
 
   <!-- ═══ LOGIN SCREEN (Shows first) ═══ -->

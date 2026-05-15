@@ -514,6 +514,265 @@ var index_default = {
     }
 
     // ══════════════════════════════════════════════════════
+    //  BUNDLE SYSTEM — Token-based reseller link generator
+    // ══════════════════════════════════════════════════════
+
+    // POST /bundle/create-token — Admin creates a bundle token
+    if (request.method === 'POST' && url.pathname === '/bundle/create-token') {
+      const authHeader = request.headers.get('Authorization');
+      const secret = env.ADMIN_SECRET;
+      if (!secret || authHeader !== `Bearer ${secret}`) {
+        return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      try {
+        const body = await request.json();
+        let token = body.token?.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '');
+        const maxLinks = parseInt(body.maxLinks) || 5;
+
+        // Auto-generate token if empty
+        if (!token) {
+          const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+          token = 'bundle-';
+          for (let i = 0; i < 8; i++) token += chars[Math.floor(Math.random() * chars.length)];
+        }
+
+        if (token.length < 3) {
+          return new Response(JSON.stringify({ success: false, error: 'Token minimal 3 karakter.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const kvKey = `bundle:${token}`;
+        const existing = await env.BIRTHDAY_DATA.get(kvKey);
+        if (existing) {
+          return new Response(JSON.stringify({ success: false, error: `Token '${token}' sudah ada.` }), {
+            status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const bundleData = {
+          token,
+          maxLinks,
+          linksCreated: [],
+          createdAt: new Date().toISOString(),
+        };
+
+        await env.BIRTHDAY_DATA.put(kvKey, JSON.stringify(bundleData));
+
+        const domainUrl = 'https://retro.for-you-always.my.id';
+        return new Response(JSON.stringify({
+          success: true,
+          token,
+          maxLinks,
+          bundleUrl: `${domainUrl}/bundle/?token=${token}`,
+          message: `Bundle token '${token}' berhasil dibuat.`,
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      } catch (error) {
+        return new Response(JSON.stringify({ success: false, error: error.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // POST /bundle/login — Validate bundle token
+    if (request.method === 'POST' && url.pathname === '/bundle/login') {
+      try {
+        const { token } = await request.json();
+        if (!token) {
+          return new Response(JSON.stringify({ success: false, error: 'Token required.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        const kvKey = `bundle:${token.trim().toLowerCase()}`;
+        const raw = await env.BIRTHDAY_DATA.get(kvKey);
+        if (!raw) {
+          return new Response(JSON.stringify({ success: false, error: 'Token tidak ditemukan.' }), {
+            status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        const data = JSON.parse(raw);
+        return new Response(JSON.stringify({
+          success: true,
+          token: data.token,
+          maxLinks: data.maxLinks,
+          linksUsed: data.linksCreated.length,
+          linksCreated: data.linksCreated,
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      } catch (error) {
+        return new Response(JSON.stringify({ success: false, error: error.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // POST /bundle/generate-link — Bundle user creates a studio link
+    if (request.method === 'POST' && url.pathname === '/bundle/generate-link') {
+      try {
+        const body = await request.json();
+        const token = body.token?.trim().toLowerCase();
+        if (!token) {
+          return new Response(JSON.stringify({ success: false, error: 'Token required.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const kvKey = `bundle:${token}`;
+        const raw = await env.BIRTHDAY_DATA.get(kvKey);
+        if (!raw) {
+          return new Response(JSON.stringify({ success: false, error: 'Token tidak valid.' }), {
+            status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const bundleData = JSON.parse(raw);
+
+        // Check limit
+        if (bundleData.linksCreated.length >= bundleData.maxLinks) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: `Limit tercapai! Token ini hanya bisa membuat ${bundleData.maxLinks} link.`,
+          }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+
+        // Create the gift link
+        let customId = body.id?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+        if (!customId || customId.length < 3) {
+          // Auto-generate
+          const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+          customId = 'retro-';
+          for (let i = 0; i < 8; i++) customId += chars[Math.floor(Math.random() * chars.length)];
+        }
+
+        const existingGift = await env.BIRTHDAY_DATA.get(customId);
+        if (existingGift) {
+          return new Response(JSON.stringify({ success: false, error: `ID '${customId}' sudah digunakan.` }), {
+            status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const template = body.template || 'birthday';
+        const studioPassword = body.studioPassword || null;
+
+        const initialConfig = {
+          id: customId,
+          studioPassword: studioPassword,
+          isPremium: true, // Bundle links are always premium
+          template: template,
+          recipientName: '',
+          age: '',
+          stage1_heading: '',
+          stage1_gif: '',
+          stage2_question: '',
+          stage4_reveal_text: '',
+          stage4_gif: '',
+          stage5_wishes: '',
+          playlist: [],
+          status: 'draft',
+          is_active: true,
+          created_at: new Date().toISOString(),
+          bundleToken: token, // Track which bundle created this
+        };
+
+        await env.BIRTHDAY_DATA.put(customId, JSON.stringify(initialConfig));
+
+        // Update bundle token usage
+        bundleData.linksCreated.push({
+          id: customId,
+          template,
+          createdAt: new Date().toISOString(),
+        });
+        await env.BIRTHDAY_DATA.put(kvKey, JSON.stringify(bundleData));
+
+        const domainUrl = 'https://retro.for-you-always.my.id';
+        return new Response(JSON.stringify({
+          success: true,
+          id: customId,
+          studioUrl: `${domainUrl}/studio/?to=${customId}`,
+          giftUrl: `${domainUrl}/?to=${customId}`,
+          remaining: bundleData.maxLinks - bundleData.linksCreated.length,
+          message: 'Link berhasil dibuat!',
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      } catch (error) {
+        return new Response(JSON.stringify({ success: false, error: error.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // GET /bundle/list-tokens — Admin lists all bundle tokens
+    if (request.method === 'GET' && url.pathname === '/bundle/list-tokens') {
+      const authHeader = request.headers.get('Authorization');
+      const secret = env.ADMIN_SECRET;
+      if (!secret || authHeader !== `Bearer ${secret}`) {
+        return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      try {
+        const list = await env.BIRTHDAY_DATA.list({ prefix: 'bundle:' });
+        const tokens = [];
+        for (const keyObj of list.keys) {
+          try {
+            const raw = await env.BIRTHDAY_DATA.get(keyObj.name);
+            if (raw) {
+              const data = JSON.parse(raw);
+              tokens.push({
+                token: data.token,
+                maxLinks: data.maxLinks,
+                linksUsed: data.linksCreated.length,
+                linksCreated: data.linksCreated,
+                createdAt: data.createdAt,
+              });
+            }
+          } catch (e) { /* skip broken entries */ }
+        }
+        return new Response(JSON.stringify({ success: true, tokens }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ success: false, error: error.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // POST /bundle/delete-token — Admin deletes a bundle token
+    if (request.method === 'POST' && url.pathname === '/bundle/delete-token') {
+      const authHeader = request.headers.get('Authorization');
+      const secret = env.ADMIN_SECRET;
+      if (!secret || authHeader !== `Bearer ${secret}`) {
+        return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      try {
+        const { token } = await request.json();
+        if (!token) {
+          return new Response(JSON.stringify({ success: false, error: 'Token required.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        const kvKey = `bundle:${token}`;
+        const existing = await env.BIRTHDAY_DATA.get(kvKey);
+        if (!existing) {
+          return new Response(JSON.stringify({ success: false, error: 'Token tidak ditemukan.' }), {
+            status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        await env.BIRTHDAY_DATA.delete(kvKey);
+        return new Response(JSON.stringify({ success: true, message: `Token '${token}' berhasil dihapus.` }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ success: false, error: error.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ══════════════════════════════════════════════════════
     //  GET /debug — Debug info
     // ══════════════════════════════════════════════════════
     if (request.method === 'GET' && url.pathname === '/debug') {
