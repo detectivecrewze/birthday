@@ -414,17 +414,71 @@ const Studio = (() => {
       }
     });
 
-    async function _searchTenor(query, selectedUrl) {
+    // ── Pagination state ──────────────────────────────
+    let _gifQuery     = '';
+    let _gifPage      = 1;
+    let _gifNextPos   = '';          // Tenor "next" cursor for forward
+    let _gifPageStack = [''];        // stack of "pos" values: index = page-1
+    let _gifSelectedUrl = '';
+
+    const paginationBar = document.getElementById('gif-pagination');
+    const pageLabel     = document.getElementById('gif-page-label');
+    const btnPrev       = document.getElementById('btn-gif-prev');
+    const btnNext       = document.getElementById('btn-gif-next');
+
+    function _showPagination(show) {
+      if (paginationBar) paginationBar.style.display = show ? 'flex' : 'none';
+    }
+    function _updatePageLabel() {
+      if (pageLabel) pageLabel.textContent = `Hal. ${_gifPage}`;
+      if (btnPrev) btnPrev.disabled = _gifPage <= 1;
+      if (btnNext) btnNext.disabled = !_gifNextPos;
+    }
+
+    btnPrev?.addEventListener('click', () => {
+      if (_gifPage <= 1) return;
+      _gifPage--;
+      const pos = _gifPageStack[_gifPage - 1] || '';
+      _fetchTenor(_gifQuery, pos, false);
+    });
+
+    btnNext?.addEventListener('click', () => {
+      if (!_gifNextPos) return;
+      _gifPage++;
+      if (_gifPageStack.length < _gifPage) _gifPageStack.push(_gifNextPos);
+      _fetchTenor(_gifQuery, _gifNextPos, false);
+    });
+
+    async function _fetchTenor(query, pos, resetPage) {
       grid.innerHTML = '<p class="gif-picker-empty">Mencari GIF...</p>';
+      _showPagination(false);
       try {
-        // Using a public Tenor API key for demo purposes. In production, consider a custom API route or key.
-        const res = await fetch(`https://g.tenor.com/v1/search?q=${encodeURIComponent(query)}&key=LIVDSRZULELA&limit=20`);
+        let url = `https://g.tenor.com/v1/search?q=${encodeURIComponent(query)}&key=LIVDSRZULELA&limit=20`;
+        if (pos) url += `&pos=${encodeURIComponent(pos)}`;
+        const res  = await fetch(url);
         const data = await res.json();
+
+        _gifNextPos = data.next || '';
         const urls = data.results.map(item => item.media[0].gif.url);
-        _renderGridItems(urls, selectedUrl);
+        _renderGridItems(urls, _gifSelectedUrl);
+
+        _showPagination(urls.length > 0);
+        _updatePageLabel();
+        // Scroll grid back to top on page change
+        const scrollBox = grid.closest('[style*="overflow-y"]') || grid.parentElement;
+        if (scrollBox) scrollBox.scrollTop = 0;
       } catch (e) {
         grid.innerHTML = '<p class="gif-picker-empty">Gagal mengambil data dari Tenor. Coba lagi nanti.</p>';
       }
+    }
+
+    async function _searchTenor(query, selectedUrl) {
+      _gifQuery      = query;
+      _gifPage       = 1;
+      _gifNextPos    = '';
+      _gifPageStack  = [''];
+      _gifSelectedUrl = selectedUrl;
+      _fetchTenor(query, '', true);
     }
 
     function _renderGridItems(urls, selectedUrl) {
@@ -440,6 +494,7 @@ const Studio = (() => {
         item.addEventListener('click', () => {
           grid.querySelectorAll('.gif-picker-item').forEach(i => i.classList.remove('selected'));
           item.classList.add('selected');
+          _gifSelectedUrl = url;
           _applyGif(url);
         });
         grid.appendChild(item);
