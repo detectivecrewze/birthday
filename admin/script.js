@@ -1,18 +1,16 @@
 /**
  * Birthday Retro Admin — script.js
- * Handles: login, cards list, generator, change-id
+ * Handles: login, cards list, bundle, QR
  */
 
 'use strict';
 
 const WORKER_URL = 'https://birthday-retro.aldoramadhan16.workers.dev';
 let adminSecret = '';
-let generatorSecret = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   initLogin();
   initTabs();
-  initGenerator();
   initCardActions();
   initBundle();
   initQR();
@@ -190,113 +188,7 @@ function initCardActions() {
   });
 }
 
-/* ═══════════════════════════════════════════════
-   GENERATOR
-═══════════════════════════════════════════════ */
-function initGenerator() {
-  // Generator login
-  document.getElementById('btn-gen-login')?.addEventListener('click', async () => {
-    const pw = document.getElementById('gen-password').value.trim();
-    if (!pw) return;
-    const error = document.getElementById('gen-login-error');
-    error.classList.add('hidden');
-    try {
-      const res = await fetch(`${WORKER_URL}/generator-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pw }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        generatorSecret = pw;
-        document.getElementById('gen-login-section').classList.add('hidden');
-        document.getElementById('gen-form-section').classList.remove('hidden');
-        document.getElementById('gen-change-section').classList.remove('hidden');
-      } else {
-        error.classList.remove('hidden');
-      }
-    } catch (e) {
-      error.textContent = 'Connection error.';
-      error.classList.remove('hidden');
-    }
-  });
 
-  // Auto ID
-  document.getElementById('btn-auto-id')?.addEventListener('click', () => {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let rand = '';
-    for (let i = 0; i < 8; i++) rand += chars[Math.floor(Math.random() * chars.length)];
-    document.getElementById('gen-id').value = `retro-${rand}`;
-  });
-
-  // Generate link
-  document.getElementById('btn-generate')?.addEventListener('click', async () => {
-    const id = document.getElementById('gen-id').value.trim();
-    const studioPass = document.getElementById('gen-studio-pass').value.trim();
-    const isPremium = document.getElementById('gen-premium').checked;
-    const error = document.getElementById('gen-error');
-    const result = document.getElementById('gen-result');
-    error.classList.add('hidden');
-    result.classList.add('hidden');
-
-    if (!id || id.length < 3) { error.textContent = 'ID minimal 3 karakter.'; error.classList.remove('hidden'); return; }
-
-    try {
-      const res = await fetch(`${WORKER_URL}/generate-link`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${generatorSecret}` },
-        body: JSON.stringify({ id, studioPassword: studioPass || null, isPremium }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        document.getElementById('gen-studio-url').href = data.studioUrl;
-        document.getElementById('gen-studio-url').textContent = data.studioUrl;
-        document.getElementById('gen-gift-url').href = data.giftUrl;
-        document.getElementById('gen-gift-url').textContent = data.giftUrl;
-        result.classList.remove('hidden');
-        loadCards(); // refresh
-      } else {
-        error.textContent = data.error;
-        error.classList.remove('hidden');
-      }
-    } catch (e) {
-      error.textContent = 'Error: ' + e.message;
-      error.classList.remove('hidden');
-    }
-  });
-
-  // Change ID
-  document.getElementById('btn-change-id')?.addEventListener('click', async () => {
-    const oldId = document.getElementById('change-old-id').value.trim();
-    const newId = document.getElementById('change-new-id').value.trim();
-    const result = document.getElementById('change-result');
-    result.classList.add('hidden');
-
-    if (!oldId || !newId) { result.textContent = 'Fill both IDs.'; result.style.color = 'red'; result.classList.remove('hidden'); return; }
-
-    try {
-      const res = await fetch(`${WORKER_URL}/change-id`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${generatorSecret}` },
-        body: JSON.stringify({ oldId, newId }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        result.textContent = `✅ Changed: ${oldId} → ${newId}`;
-        result.style.color = 'green';
-        loadCards();
-      } else {
-        result.textContent = data.error;
-        result.style.color = 'red';
-      }
-      result.classList.remove('hidden');
-    } catch (e) {
-      result.textContent = 'Error: ' + e.message;
-      result.style.color = 'red';
-      result.classList.remove('hidden');
-    }
-  });
-}
 
 /* ═══════════════════════════════════════════════
    BUNDLE

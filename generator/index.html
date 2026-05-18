@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔗 Link Generator — Retro Gift</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══ LOGIN SCREEN ═══ -->
+  <div id="login-screen" class="screen-overlay">
+    <div class="win-dialog" style="width:340px;">
+      <div class="win-titlebar">
+        <span class="win-title-text">🔐 Generator Login</span>
+      </div>
+      <div class="win-body" style="padding:20px;">
+        <p style="margin-bottom:10px;">Masukkan generator password:</p>
+        <input id="gen-password" type="password" class="win-input" placeholder="Password..." style="width:100%;">
+        <p id="login-error" class="hidden" style="color:red;font-size:0.9rem;margin-top:6px;">Password salah.</p>
+        <div style="text-align:right;margin-top:12px;">
+          <button id="btn-login" class="win-btn win-btn-primary">Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN APP ═══ -->
+  <div id="app" class="hidden">
+    <!-- Taskbar -->
+    <div class="gen-taskbar">
+      <span>🪟 <strong>Generator</strong></span>
+      <div class="taskbar-sep"></div>
+      <span class="taskbar-active">🔗 Link Generator</span>
+      <button id="btn-logout" class="win-btn" style="margin-left:auto;font-size:0.85rem;padding:2px 10px;">Logout</button>
+    </div>
+
+    <div class="gen-content">
+
+      <!-- ═══ CREATE NEW LINK ═══ -->
+      <div class="panel-window">
+        <div class="win-titlebar">
+          <span class="win-title-text">🆕 Buat Link Baru</span>
+        </div>
+        <div class="win-body" style="padding:20px;">
+          <fieldset class="gen-section">
+            <legend>🆕 Create New Link</legend>
+
+            <div class="field-row">
+              <label>ID (slug):</label>
+              <div style="display:flex;gap:8px;flex:1;">
+                <input id="gen-id" type="text" class="win-input" placeholder="retro-special-gift" maxlength="40" style="flex:1;">
+                <button id="btn-auto-id" class="win-btn">Auto</button>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <label>Studio Password:</label>
+              <input id="gen-studio-pass" type="text" class="win-input" placeholder="(optional)">
+            </div>
+
+            <div class="field-row">
+              <label>Premium:</label>
+              <label style="min-width:auto;"><input type="checkbox" id="gen-premium"> Yes</label>
+            </div>
+
+            <button id="btn-generate" class="win-btn win-btn-primary" style="margin-top:10px;">Generate Link</button>
+
+            <!-- Result Box -->
+            <div id="gen-result" class="hidden result-box" style="margin-top:14px;">
+              <p><strong>✅ Link berhasil dibuat!</strong></p>
+
+              <div class="link-row">
+                <span class="link-label">🎨 Studio:</span>
+                <a id="gen-studio-url" href="#" target="_blank" class="link-value"></a>
+                <button class="win-btn copy-btn" data-target="gen-studio-url">📋 Copy</button>
+              </div>
+
+              <div class="link-row">
+                <span class="link-label">🎁 Gift:</span>
+                <a id="gen-gift-url" href="#" target="_blank" class="link-value"></a>
+                <button class="win-btn copy-btn" data-target="gen-gift-url">📋 Copy</button>
+              </div>
+
+              <div class="copy-toast hidden" id="copy-toast">✔ Copied!</div>
+            </div>
+
+            <p id="gen-error" class="hidden" style="color:red;font-size:0.9rem;margin-top:8px;"></p>
+          </fieldset>
+        </div>
+      </div>
+
+      <!-- ═══ CHANGE ID ═══ -->
+      <div class="panel-window" style="margin-top:16px;">
+        <div class="win-titlebar">
+          <span class="win-title-text">✏️ Ganti ID</span>
+        </div>
+        <div class="win-body" style="padding:20px;">
+          <fieldset class="gen-section">
+            <legend>✏️ Change ID</legend>
+
+            <div class="field-row">
+              <label>Old ID:</label>
+              <input id="change-old-id" type="text" class="win-input" placeholder="current-id">
+            </div>
+
+            <div class="field-row">
+              <label>New ID:</label>
+              <input id="change-new-id" type="text" class="win-input" placeholder="new-id">
+            </div>
+
+            <button id="btn-change-id" class="win-btn" style="margin-top:8px;">Change ID</button>
+            <p id="change-result" class="hidden" style="margin-top:8px;"></p>
+          </fieldset>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
