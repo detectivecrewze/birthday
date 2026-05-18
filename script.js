@@ -360,6 +360,43 @@ function goToStage(id) {
 /* ═══════════════════════════════════════════════
    TYPING ENGINE
 ═══════════════════════════════════════════════ */
+let errorAudioCtx;
+function playErrorSound() {
+  try {
+    if (!errorAudioCtx) {
+      errorAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (errorAudioCtx.state === 'suspended') {
+      errorAudioCtx.resume().catch(() => {});
+    }
+    // Approximation of Windows 98 chord.wav
+    const freqs = [261.63, 329.63, 392.00, 523.25]; 
+    freqs.forEach(freq => {
+      const osc = errorAudioCtx.createOscillator();
+      const gain = errorAudioCtx.createGain();
+      const filter = errorAudioCtx.createBiquadFilter();
+      
+      osc.type = 'square';
+      osc.frequency.value = freq;
+      
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1200, errorAudioCtx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(200, errorAudioCtx.currentTime + 0.4);
+
+      gain.gain.setValueAtTime(0, errorAudioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.08, errorAudioCtx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, errorAudioCtx.currentTime + 0.5);
+      
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(errorAudioCtx.destination);
+      
+      osc.start();
+      osc.stop(errorAudioCtx.currentTime + 0.6);
+    });
+  } catch(e) {}
+}
+
 let typeAudioCtx;
 function playTypingSound() {
   try {
@@ -665,31 +702,31 @@ function initStage6(cfg) {
   // Open the modal (called when user clicks the button)
   openModal();
 }
-
-/* ═══════════════════════════════════════════════
+/* -----------------------------------------------
    NAVIGATION BINDINGS
-═══════════════════════════════════════════════ */
+----------------------------------------------- */
 function bindNavigation(cfg) {
-  // Stage 1 → Stage 2
-  // Stage 1 → Stage Music (handled dynamically by CD Player engine)
+  // Stage 1 ? Stage 2
+  // Stage 1 ? Stage Music (handled dynamically by CD Player engine)
   // if no music, skips to Stage 2.
 
-  // Stage 2 — Yes → Stage 3
+  // Stage 2 � Yes ? Stage 3
   document.getElementById('btn-yes')?.addEventListener('click', () => {
     goToStage('stage-3');
   });
 
-  // Stage 2 — No → Error dialog
+  // Stage 2 � No ? Error dialog
   document.getElementById('btn-no')?.addEventListener('click', () => {
+    playErrorSound();
     goToStage('no-dialog');
   });
 
-  // Error dialog → back to Stage 2
+  // Error dialog ? back to Stage 2
   document.getElementById('btn-no-ok')?.addEventListener('click', () => {
     goToStage('stage-2');
   });
 
-  // Stage 3 → Stage 4
+  // Stage 3 ? Stage 4
   document.getElementById('btn-open-gift')?.addEventListener('click', () => {
     goToStage('stage-4');
     initStage4(cfg);
