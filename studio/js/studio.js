@@ -155,6 +155,33 @@ const Studio = (() => {
     _setVal('input-stage1-gif', cfg.stage1_gif || '');
     _setVal('input-stage4-gif', cfg.stage4_gif || '');
 
+    // GIF Live Previews
+    function _updateGifPreview(inputId, previewId) {
+      const input = document.getElementById(inputId);
+      const preview = document.getElementById(previewId);
+      if (!input || !preview) return;
+      const url = input.value.trim();
+      if (url) {
+        preview.src = url;
+        preview.style.display = 'block';
+      } else {
+        preview.src = '';
+        preview.style.display = 'none';
+      }
+    }
+
+    const s1GifInput = document.getElementById('input-stage1-gif');
+    if (s1GifInput) {
+      s1GifInput.addEventListener('input', () => _updateGifPreview('input-stage1-gif', 'preview-stage1-gif'));
+      _updateGifPreview('input-stage1-gif', 'preview-stage1-gif'); // init on load
+    }
+
+    const s4GifInput = document.getElementById('input-stage4-gif');
+    if (s4GifInput) {
+      s4GifInput.addEventListener('input', () => _updateGifPreview('input-stage4-gif', 'preview-stage4-gif'));
+      _updateGifPreview('input-stage4-gif', 'preview-stage4-gif'); // init on load
+    }
+
     // Initialize Music Manager
     if (typeof Music !== 'undefined') {
       Music.setPremiumMode(_isPremium);
