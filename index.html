@@ -176,41 +176,76 @@
       </div>
       <div class="win-menubar">Disc&ensp; View&ensp; Options&ensp; Help</div>
       <div class="win-body cdplayer-body">
+        <style>
+          @keyframes marquee-scroll {
+            0% { transform: translateX(150px); }
+            100% { transform: translateX(-100%); }
+          }
+          .tracklist-item { display: flex; padding: 2px 4px; cursor: pointer; gap: 8px; }
+          .tracklist-item:hover { background: #000082; color: #fff; }
+          .tracklist-item.active { background: #000082; color: #fff; }
+          .tracklist-item .track-num { color: #888; width: 20px; }
+          .tracklist-item .track-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .tracklist-item .track-artist { color: #888; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
+          .tracklist-item.active .track-num, .tracklist-item.active .track-artist { color: #fff; }
+          .cd-btn.active { border-style: inset; padding-top: 4px; padding-left: 2px; }
+        </style>
         
-        <div class="cdplayer-top">
-          <div class="cdplayer-lcd">
-            <div class="lcd-track">Track <span id="cd-track-num">01</span></div>
-            <div class="lcd-time" id="cd-time">00:00</div>
+        <!-- Top Row: Cover & LCD -->
+        <div class="cdplayer-top" style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <!-- Left: Cover -->
+          <div class="cdplayer-cover" id="cd-cover-container" style="width: 80px; height: 80px; flex-shrink: 0; background: #c0c0c0; border: 2px inset #fff; border-color: #808080 #fff #fff #808080; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+            <div id="cd-cover-fallback" class="spinning-cd paused" style="font-size: 3rem;">💿</div>
           </div>
-          <div class="cdplayer-disc-icon">
-            <div class="spinning-cd paused">💿</div>
+          <!-- Right: LCD Panel -->
+          <div class="cdplayer-lcd" style="flex: 1; background: #000; border: 2px inset #fff; border-color: #808080 #fff #fff #808080; color: #00ff41; font-family: 'VT323', monospace; display: flex; flex-direction: column; padding: 4px 6px; overflow: hidden; position: relative;">
+            <!-- Marquee -->
+            <div style="font-size: 1.1rem; white-space: nowrap; overflow: hidden; position: relative; height: 1.2rem; margin-bottom: 2px;">
+              <div id="cd-marquee" style="position: absolute; white-space: nowrap; animation: marquee-scroll 6s linear infinite;">Unknown Artist - Audio CD</div>
+            </div>
+            <!-- Timer -->
+            <div id="cd-time" style="font-size: 2.2rem; font-weight: bold; text-align: center; flex: 1; display: flex; align-items: center; justify-content: center; line-height: 1;">00:00</div>
+            <!-- Track Info -->
+            <div style="font-size: 0.9rem; text-align: justify; text-align-last: justify; opacity: 0.8; margin-top: auto;">
+              <span id="cd-track-num">TRACK 01 / 01</span> <span>| 320kbps</span>
+            </div>
           </div>
         </div>
 
-        <div class="cdplayer-controls">
-          <button class="win-btn cd-btn" id="cd-prev" title="Prev">⏮</button>
-          <button class="win-btn cd-btn" id="cd-toggle" title="Play/Pause">▶</button>
-          <button class="win-btn cd-btn" id="cd-next" title="Next">⏭</button>
-          <button class="win-btn cd-btn" id="cd-stop" title="Stop">⏹</button>
-          <button class="win-btn cd-btn" id="cd-loop" title="Loop">🔁</button>
+        <!-- Progress Bar -->
+        <div style="margin-bottom: 8px; border: 2px inset #fff; border-color: #808080 #fff #fff #808080; height: 12px; background: #fff; width: 100%; position: relative;">
+          <div id="cd-progress-fill" style="position: absolute; top: 0; left: 0; bottom: 0; width: 0%; background: #000082;"></div>
         </div>
 
-        <div class="cdplayer-volume">
-          <span class="vol-icon" id="cd-vol-icon">🔊</span>
-          <input type="range" id="cd-volume" class="vol-slider" min="0" max="100" value="80" aria-label="Volume">
-          <span class="vol-pct" id="cd-vol-pct">80%</span>
+        <!-- Controls -->
+        <div class="cdplayer-controls" style="display: flex; gap: 4px; margin-bottom: 8px;">
+          <button class="win-btn cd-btn" id="cd-prev" title="Prev" style="flex: 1; font-size: 0.9rem;">⏮</button>
+          <button class="win-btn cd-btn" id="cd-toggle" title="Play/Pause" style="flex: 1.5; font-size: 0.9rem;">▶</button>
+          <button class="win-btn cd-btn" id="cd-next" title="Next" style="flex: 1; font-size: 0.9rem;">⏭</button>
+          <button class="win-btn cd-btn" id="cd-stop" title="Stop" style="flex: 1; font-size: 0.9rem;">⏹</button>
+          <button class="win-btn cd-btn" id="cd-loop" title="Loop" style="flex: 1; font-size: 0.9rem;">🔁</button>
         </div>
 
-        <div class="cdplayer-info">
-          Artist: <span id="cd-artist">Unknown</span><br>
-          Title: <span id="cd-title">Audio CD</span>
+        <!-- Volume -->
+        <div class="cdplayer-volume" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; border: 2px inset #fff; border-color: #808080 #fff #fff #808080; padding: 4px 8px; background: #c0c0c0;">
+          <span style="font-weight: bold; font-size: 0.8rem; margin-top:2px;">🔊 VOL</span>
+          <input type="range" id="cd-volume" class="vol-slider" min="0" max="100" value="80" aria-label="Volume" style="flex: 1; margin:0;">
+          <span class="vol-pct" id="cd-vol-pct" style="width: 30px; text-align: right; font-size: 0.8rem; margin-top:2px;">80%</span>
         </div>
 
-        <div style="text-align:right; margin-top:20px;">
+        <!-- Tracklist -->
+        <div id="cd-tracklist" style="background: #fff; border: 2px inset #fff; border-color: #808080 #fff #fff #808080; max-height: 80px; overflow-y: auto; font-size: 0.85rem; margin-bottom: 12px; font-family: 'Fredoka', sans-serif;">
+          <!-- dynamically populated by JS -->
+        </div>
+
+        <div style="text-align:right;">
           <button id="btn-next-music" class="win-btn win-btn-pill">next &gt;</button>
         </div>
       </div>
-      <div class="win-statusbar">Now Playing</div>
+      <div class="win-statusbar" style="display: flex; justify-content: space-between; padding: 2px 6px;">
+        <span id="cd-status-text">Stopped</span>
+        <span id="cd-status-time">00:00 / 00:00</span>
+      </div>
     </div>
     
     <div class="music-gif-area">

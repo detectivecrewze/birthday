@@ -730,7 +730,6 @@ function initCDPlayer(cfg) {
   const audio = document.getElementById('bday-audio');
   let currentIdx = 0;
   
-  // If no music, btn-next-1 goes straight to question
   if (playlist.length === 0) {
     document.getElementById('btn-next-1')?.addEventListener('click', () => {
       goToStage('stage-2');
@@ -739,14 +738,11 @@ function initCDPlayer(cfg) {
     return;
   }
 
-  // Bind btn-next-1 to open CD Player
   document.getElementById('btn-next-1')?.addEventListener('click', () => {
     goToStage('stage-music');
-    // Auto play first track if browser allows
     if (audio.paused) playTrack(0);
   });
 
-  // Next button inside CD player goes to question
   document.getElementById('btn-next-music')?.addEventListener('click', () => {
     goToStage('stage-2');
     initStage2(cfg);
@@ -754,27 +750,22 @@ function initCDPlayer(cfg) {
 
   const timeEl = document.getElementById('cd-time');
   const trackEl = document.getElementById('cd-track-num');
-  const artistEl = document.getElementById('cd-artist');
-  const titleEl = document.getElementById('cd-title');
-  const discIcon = document.querySelector('.spinning-cd');
-
-  // Volume control
+  const marqueeEl = document.getElementById('cd-marquee');
+  const progressFill = document.getElementById('cd-progress-fill');
+  const statusText = document.getElementById('cd-status-text');
+  const statusTime = document.getElementById('cd-status-time');
+  const tracklistContainer = document.getElementById('cd-tracklist');
+  const coverFallback = document.getElementById('cd-cover-fallback');
   const volSlider = document.getElementById('cd-volume');
   const volPct    = document.getElementById('cd-vol-pct');
   const volIcon   = document.getElementById('cd-vol-icon');
   let lastVol = 0.8;
 
-  // Set initial audio volume
   audio.volume = 0.8;
 
   function updateVolUI(val) {
     const pct = Math.round(val * 100);
     if (volPct) volPct.textContent = pct + '%';
-    if (volIcon) {
-      if (val === 0)       volIcon.textContent = '🔇';
-      else if (val < 0.4)  volIcon.textContent = '🔉';
-      else                 volIcon.textContent = '🔊';
-    }
   }
 
   volSlider?.addEventListener('input', () => {
@@ -785,77 +776,104 @@ function initCDPlayer(cfg) {
     updateVolUI(val);
   });
 
-  // Click icon to toggle mute
-  volIcon?.addEventListener('click', () => {
-    if (audio.muted || audio.volume === 0) {
-      audio.muted = false;
-      audio.volume = lastVol || 0.8;
-      if (volSlider) volSlider.value = Math.round((lastVol || 0.8) * 100);
-      updateVolUI(audio.volume);
-    } else {
-      lastVol = audio.volume;
-      audio.muted = true;
-      if (volSlider) volSlider.value = 0;
-      updateVolUI(0);
-    }
-  });
+  if (tracklistContainer) {
+    tracklistContainer.innerHTML = '';
+    playlist.forEach((t, i) => {
+      const div = document.createElement('div');
+      div.className = 'tracklist-item';
+      div.innerHTML = `
+        <div class="track-num">${String(i + 1).padStart(2, '0')}</div>
+        <div class="track-title">${t.title || 'Track ' + (i + 1)}</div>
+        <div class="track-artist">${t.artist || 'Unknown Artist'}</div>
+      `;
+      div.addEventListener('click', () => playTrack(i));
+      tracklistContainer.appendChild(div);
+    });
+  }
+
+  function updateTracklistUI() {
+    document.querySelectorAll('.tracklist-item').forEach((el, i) => {
+      if (i === currentIdx) {
+        el.classList.add('active');
+        if (el.offsetTop < tracklistContainer.scrollTop || el.offsetTop + el.clientHeight > tracklistContainer.scrollTop + tracklistContainer.clientHeight) {
+          tracklistContainer.scrollTop = el.offsetTop - 20;
+        }
+      } else {
+        el.classList.remove('active');
+      }
+    });
+  }
+
+  function formatTime(secs) {
+    if (isNaN(secs) || !isFinite(secs)) return "00:00";
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60).toString().padStart(2, '0');
+    return `${m.toString().padStart(2, '0')}:${s}`;
+  }
 
   function playTrack(idx) {
     const t = playlist[idx];
     if (!t) return;
-    audio.src = t.url || t.audioUrl || t.src;
+    currentIdx = idx;
     
-    // Reset time to 0 to ensure it plays from start if switching tracks
+    audio.src = t.url || t.audioUrl || t.src;
     audio.currentTime = 0;
     
     audio.play().catch(e => {
       console.warn('Autoplay blocked or load failed:', e);
+      if (statusText) statusText.textContent = 'Paused';
     });
     
-    trackEl.textContent = String(idx + 1).padStart(2, '0');
-    artistEl.textContent = t.artist || 'Unknown Artist';
-    titleEl.textContent = t.title || 'Track ' + (idx + 1);
+    if (trackEl) trackEl.textContent = `TRACK ${String(idx + 1).padStart(2, '0')} / ${String(playlist.length).padStart(2, '0')}`;
+    const artistTitle = `${t.artist || 'Unknown Artist'} - ${t.title || 'Track ' + (idx + 1)}`;
+    if (marqueeEl) marqueeEl.textContent = `${artistTitle}        ***        ${artistTitle}`;
+
+    updateTracklistUI();
   }
 
-  // Use a function to get the element dynamically in case it wasn't ready or changed
-  function getDiscIcon() {
-    return document.querySelector('.spinning-cd');
+  function updateDiscStatus() {
+    if (audio.paused) {
+      coverFallback?.classList.add('paused');
+      const toggleBtn = document.getElementById('cd-toggle');
+      if (toggleBtn) toggleBtn.textContent = '▶';
+      if (statusText && statusText.textContent !== 'Stopped') statusText.textContent = 'Paused';
+    } else {
+      coverFallback?.classList.remove('paused');
+      const toggleBtn = document.getElementById('cd-toggle');
+      if (toggleBtn) toggleBtn.textContent = '⏸';
+      if (statusText) statusText.textContent = 'Playing';
+    }
   }
 
-  audio.addEventListener('play', () => {
-    getDiscIcon()?.classList.remove('paused');
-    const toggleBtn = document.getElementById('cd-toggle');
-    if (toggleBtn) toggleBtn.textContent = '⏸';
-  });
-  
-  audio.addEventListener('pause', () => {
-    getDiscIcon()?.classList.add('paused');
-    const toggleBtn = document.getElementById('cd-toggle');
-    if (toggleBtn) toggleBtn.textContent = '▶';
-  });
+  audio.addEventListener('play', updateDiscStatus);
+  audio.addEventListener('pause', updateDiscStatus);
   
   audio.addEventListener('timeupdate', () => {
-    if (!audio.duration) return;
-    const m = Math.floor(audio.currentTime / 60);
-    const s = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
-    if(timeEl) timeEl.textContent = `${m.toString().padStart(2, '0')}:${s}`;
+    const cur = audio.currentTime;
+    const dur = audio.duration || 0;
+    
+    if(timeEl) timeEl.textContent = formatTime(cur);
+    if (progressFill && dur > 0) {
+      progressFill.style.width = `${(cur / dur) * 100}%`;
+    }
+
+    if (statusTime && dur > 0) {
+      statusTime.textContent = `${formatTime(cur)} / ${formatTime(dur)}`;
+    } else if (statusTime) {
+      statusTime.textContent = `${formatTime(cur)} / 00:00`;
+    }
   });
 
   audio.addEventListener('ended', () => {
+    if (audio.loop) return;
     currentIdx = (currentIdx + 1) % playlist.length;
     playTrack(currentIdx);
   });
 
   document.getElementById('cd-toggle')?.addEventListener('click', () => {
     if (audio.paused) {
-      if (!audio.src || audio.src === window.location.href) {
-        playTrack(currentIdx);
-      } else {
-        audio.play().catch(e => {
-          console.error("Play failed:", e);
-          playTrack(currentIdx);
-        });
-      }
+      if (!audio.src || audio.src === window.location.href) playTrack(currentIdx);
+      else audio.play();
     } else {
       audio.pause();
     }
@@ -863,12 +881,23 @@ function initCDPlayer(cfg) {
 
   document.getElementById('cd-loop')?.addEventListener('click', (e) => {
     audio.loop = !audio.loop;
-    e.currentTarget.style.boxShadow = audio.loop ? 'var(--sink)' : 'var(--raise)';
+    if (audio.loop) {
+      e.currentTarget.classList.add('active');
+    } else {
+      e.currentTarget.classList.remove('active');
+    }
   });
 
   document.getElementById('cd-stop')?.addEventListener('click', () => {
     audio.pause();
     audio.currentTime = 0;
+    if (statusText) statusText.textContent = 'Stopped';
+    if (timeEl) timeEl.textContent = '00:00';
+    if (progressFill) progressFill.style.width = '0%';
+    if (statusTime) {
+      const dur = audio.duration || 0;
+      statusTime.textContent = `00:00 / ${formatTime(dur)}`;
+    }
   });
 
   document.getElementById('cd-prev')?.addEventListener('click', () => {
@@ -881,11 +910,11 @@ function initCDPlayer(cfg) {
     playTrack(currentIdx);
   });
 
-  // Initialize UI without playing
   const first = playlist[0];
-  if(first) {
-    trackEl.textContent = '01';
-    artistEl.textContent = first.artist || 'Unknown Artist';
-    titleEl.textContent = first.title || 'Track 1';
+  if (first) {
+    if (trackEl) trackEl.textContent = `TRACK 01 / ${String(playlist.length).padStart(2, '0')}`;
+    const artistTitle = `${first.artist || 'Unknown Artist'} - ${first.title || 'Track 1'}`;
+    if (marqueeEl) marqueeEl.textContent = `${artistTitle}        ***        ${artistTitle}`;
+    updateTracklistUI();
   }
 }
