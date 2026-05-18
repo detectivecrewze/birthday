@@ -285,25 +285,76 @@ function initClock() {
 /* ═══════════════════════════════════════════════
    STAGE MANAGEMENT
 ═══════════════════════════════════════════════ */
-function goToStage(id) {
-  document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
-  const target = document.getElementById(id);
-  if (target) target.classList.add('active');
+let _isTransitioning = false;
 
-  // Update taskbar label
-  const tpl = TEMPLATE_DEFAULTS[window._currentCfg?.template] || TEMPLATE_DEFAULTS.birthday;
-  const labels = {
-    'stage-login': '🔐 Security check',
-    'stage-1': tpl.taskbar_label,
-    'stage-2': '❓ Question',
-    'stage-3': '📁 gift.exe',
-    'stage-4': '🎉 surprise.exe',
-    'stage-5': tpl.stage5_titlebar,
-    'stage-6': '🖼️ secret_memory.exe',
-    'no-dialog': '⚠️ Error',
-  };
-  const win = document.getElementById('taskbar-win-label');
-  if (win && labels[id]) win.textContent = labels[id];
+function goToStage(id) {
+  if (_isTransitioning) return;
+  const currentStage = document.querySelector('.stage.active');
+  const target = document.getElementById(id);
+
+  function updateTaskbarLocal(targetId) {
+    const tpl = TEMPLATE_DEFAULTS[window._currentCfg?.template] || TEMPLATE_DEFAULTS.birthday;
+    const labels = {
+      'stage-login': '🔐 Security check',
+      'stage-1': tpl.taskbar_label,
+      'stage-2': '❓ Question',
+      'stage-3': '📁 gift.exe',
+      'stage-4': '🎉 surprise.exe',
+      'stage-5': tpl.stage5_titlebar,
+      'stage-6': '🖼️ secret_memory.exe',
+      'no-dialog': '⚠️ Error',
+    };
+    const win = document.getElementById('taskbar-win-label');
+    if (win && labels[targetId]) win.textContent = labels[targetId];
+  }
+
+  // Initial load or same stage
+  if (!currentStage || currentStage.id === id) {
+    if (target) target.classList.add('active');
+    updateTaskbarLocal(id);
+    return;
+  }
+
+  _isTransitioning = true;
+
+  // 1. Minimize current stage (Zoom out to bottom taskbar)
+  currentStage.style.transformOrigin = 'center bottom';
+  currentStage.style.transition = 'transform 180ms ease-in, opacity 150ms ease-in';
+  currentStage.style.transform = 'translateY(40vh) scale(0.1)';
+  currentStage.style.opacity = '0';
+
+  setTimeout(() => {
+    currentStage.classList.remove('active');
+    currentStage.style.transition = '';
+    currentStage.style.transform = '';
+    currentStage.style.opacity = '';
+
+    updateTaskbarLocal(id);
+
+    // 2. Maximize next stage (Zoom in from bottom taskbar)
+    if (target) {
+      target.classList.add('active');
+      target.style.transformOrigin = 'center bottom';
+      target.style.transform = 'translateY(40vh) scale(0.1)';
+      target.style.opacity = '0';
+      
+      // Force reflow
+      void target.offsetWidth;
+
+      target.style.transition = 'transform 200ms ease-out, opacity 200ms ease-out';
+      target.style.transform = 'translateY(0) scale(1)';
+      target.style.opacity = '1';
+
+      setTimeout(() => {
+        target.style.transition = '';
+        target.style.transform = '';
+        target.style.opacity = '';
+        _isTransitioning = false;
+      }, 200);
+    } else {
+      _isTransitioning = false;
+    }
+  }, 180);
 }
 
 /* ═══════════════════════════════════════════════
