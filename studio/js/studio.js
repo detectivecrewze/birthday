@@ -196,6 +196,21 @@ const Studio = (() => {
     _setVal('input-gift-password', cfg.giftPassword || '');
     _setVal('input-gift-hint', cfg.giftHint || '');
     
+    const togglePasswordBtn = document.getElementById('btn-toggle-password');
+    if (togglePasswordBtn && passwordInput) {
+      togglePasswordBtn.addEventListener('click', () => {
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          togglePasswordBtn.textContent = '🙈';
+          togglePasswordBtn.title = 'Sembunyikan password';
+        } else {
+          passwordInput.type = 'password';
+          togglePasswordBtn.textContent = '👁️';
+          togglePasswordBtn.title = 'Lihat password';
+        }
+      });
+    }
+    
     if (!_isPremium) {
       if (loginOverlay) loginOverlay.classList.remove('hidden');
       if (passwordInput) passwordInput.disabled = true;

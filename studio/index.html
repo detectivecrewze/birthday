@@ -172,12 +172,15 @@
           </div>
 
           <div class="field-row">
-            <label for="input-gift-password">Password:</label>
-            <input id="input-gift-password" type="text" class="win-input" placeholder="Opsional (Kosongkan jika tidak perlu)" maxlength="20">
-          </div>
-          <div class="field-row">
             <label for="input-gift-hint">Hint / Petunjuk:</label>
             <input id="input-gift-hint" type="text" class="win-input" placeholder="Contoh: Tanggal jadian kita" maxlength="50">
+          </div>
+          <div class="field-row">
+            <label for="input-gift-password">Password:</label>
+            <div style="display: flex; flex: 1; gap: 4px;">
+              <input id="input-gift-password" type="password" class="win-input" placeholder="Opsional (Kosongkan jika tidak perlu)" maxlength="20" style="flex: 1;">
+              <button type="button" id="btn-toggle-password" class="win-btn" style="min-width: 32px;" title="Lihat password">👁️</button>
+            </div>
           </div>
           <p class="field-hint">Kunci kadomu dengan password. Penerima harus memasukkan password untuk melihat kado.</p>
         </fieldset>
