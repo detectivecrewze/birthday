@@ -238,7 +238,7 @@ const Publisher = (() => {
 
           // Build WhatsApp link
           const waMsg = encodeURIComponent(
-            `REQUEST LINK PRIBADI — RETRO GIFT (+7K)\n\n` +
+            `REQUEST LINK PRIBADI — RETRO GIFT (+5K)\n\n` +
             `Domain: ${data.domain}\n` +
             `Nama Penerima: ${state.recipientName || '—'}\n` +
             `Template: ${state.template || 'birthday'}\n\n` +
