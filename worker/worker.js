@@ -280,8 +280,8 @@ var index_default = {
     if (request.method === 'POST' && url.pathname === '/generate-link') {
       try {
         const authHeader = request.headers.get('Authorization');
-        const secret = env.GENERATOR_SECRET;
-        if (!secret || authHeader !== `Bearer ${secret}`) {
+        const secret = env.GENERATOR_SECRET || "digitalatelier2025";
+        if (!authHeader || authHeader !== `Bearer ${secret}`) {
           return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
         }
 
@@ -324,8 +324,8 @@ var index_default = {
         return new Response(JSON.stringify({
           success: true,
           id: customId,
-          studioUrl: `${domainUrl}/studio/?to=${customId}`,
-          giftUrl: `${domainUrl}/?to=${customId}`,
+          studioUrl: `${domainUrl}/studio/${customId}`,
+          giftUrl: `${domainUrl}/${customId}`,
           message: 'Link berhasil dibuat',
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       } catch (error) {
@@ -367,7 +367,7 @@ var index_default = {
         return new Response(JSON.stringify({
           success: true, id: newId,
           studioUrl: `${domainUrl}/studio/${newId}`,
-          giftUrl: `${domainUrl}/?to=${newId}`,
+          giftUrl: `${domainUrl}/${newId}`,
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       } catch (error) {
         return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: corsHeaders });
@@ -760,8 +760,8 @@ var index_default = {
         return new Response(JSON.stringify({
           success: true,
           id: customId,
-          studioUrl: `${domainUrl}/studio/?to=${customId}`,
-          giftUrl: `${domainUrl}/?to=${customId}`,
+          studioUrl: `${domainUrl}/studio/${customId}`,
+          giftUrl: `${domainUrl}/${customId}`,
           remaining: bundleData.maxLinks - bundleData.linksCreated.length,
           message: 'Link berhasil dibuat!',
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });

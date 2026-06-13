@@ -121,9 +121,11 @@ function applyTemplate(cfg) {
 document.addEventListener('DOMContentLoaded', async () => {
   initClock();
 
-  // Check for ?to= parameter → load from Worker
+  // Check for ?to= parameter or pathname → load from Worker
   const params = new URLSearchParams(window.location.search);
-  const giftId = params.get('to') || params.get('token') || params.get('id');
+  const pathParts = window.location.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+  const idFromPath = pathParts[pathParts.length - 1] === 'studio' || pathParts[pathParts.length - 1] === 'retro' ? null : pathParts[pathParts.length - 1];
+  const giftId = params.get('to') || params.get('token') || params.get('id') || idFromPath;
   let cfg = window.BIRTHDAY_CONFIG || {};
 
   // ── MAINTENANCE MODE CHECK ───────────────────────────────────

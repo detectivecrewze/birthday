@@ -1,3 +1,21 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/studio/:to",
+      "destination": "/studio/index.html?to=$to"
+    },
+    {
+      "source": "/studio",
+      "destination": "/studio/index.html"
+    },
+    {
+      "source": "/studio/(.*)",
+      "destination": "/studio/$1"
+    },
+    {
+      "source": "/:to",
+      "destination": "/index.html?to=$to"
+    }
+  ]
 }
