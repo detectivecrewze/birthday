@@ -8,7 +8,7 @@ id = "aa99267722f84f46a144b45e07e17117"
 
 [[r2_buckets]]
 binding = "BUCKET"
-bucket_name = "letter-assets"
+bucket_name = "arcade-edition-storage"
 
 [vars]
 # Set secrets via: wrangler secret put ADMIN_SECRET / GENERATOR_SECRET

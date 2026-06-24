@@ -15,7 +15,7 @@ const Publisher = (() => {
         `ID Kado: ${token}\n\n` +
         `Halo admin, saya ingin request upgrade akun Premium untuk membuka fitur Tema Spesial, Password Security, dan Secret Media.`
       );
-      window.open(`https://wa.me/6281381543981?text=${waMsg}`, '_blank');
+      window.open(`https://wa.me/6281936109076?text=${waMsg}`, '_blank');
     });
 
     // ── Standalone Request ──────────────────────────────────────
@@ -244,7 +244,7 @@ const Publisher = (() => {
             `Template: ${state.template || 'birthday'}\n\n` +
             `Data sudah terkirim otomatis. Mohon diproses ya, terima kasih!`
           );
-          document.getElementById('btn-standalone-wa').href = `https://wa.me/6281381543981?text=${waMsg}`;
+          document.getElementById('btn-standalone-wa').href = `https://wa.me/6281936109076?text=${waMsg}`;
         }, 500);
       } else {
         throw new Error(data.error || 'Gagal mengirim request.');
