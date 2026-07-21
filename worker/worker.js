@@ -135,6 +135,31 @@ var index_default = {
     }
 
     // ══════════════════════════════════════════════════════
+    //  GET /giphy-search — Proxy Giphy search
+    // ══════════════════════════════════════════════════════
+    if (request.method === 'GET' && url.pathname === '/giphy-search') {
+      try {
+        const query = url.searchParams.get('q') || '';
+        const offset = url.searchParams.get('offset') || '0';
+        // GIPHY_API_KEY should be set in environment variables via:
+        // wrangler secret put GIPHY_API_KEY
+        const apiKey = env.GIPHY_API_KEY || 'QtjHpVUgoS3N9iMEH4oy96jVlJMX9AJu'; // Fallback for now if secret not set
+        
+        const giphyUrl = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=20&offset=${offset}`;
+        const giphyRes = await fetch(giphyUrl);
+        const giphyData = await giphyRes.json();
+        
+        return new Response(JSON.stringify(giphyData), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ error: 'Giphy search failed' }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ══════════════════════════════════════════════════════
     //  GET /get-config?id=xxx — Ambil config birthday
     // ══════════════════════════════════════════════════════
     if (request.method === 'GET' && url.pathname === '/get-config') {

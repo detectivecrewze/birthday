@@ -451,8 +451,8 @@ const Studio = (() => {
       _showPagination(false);
       try {
         const offset = (_gifPage - 1) * 20;
-        const apiKey = 'QtjHpVUgoS3N9iMEH4oy96jVlJMX9AJu';
-        const url = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=20&offset=${offset}`;
+        const workerUrl = Auth.getWorkerUrl();
+        const url = `${workerUrl}/giphy-search?q=${encodeURIComponent(query)}&offset=${offset}`;
         
         const res  = await fetch(url);
         const data = await res.json();
@@ -463,7 +463,7 @@ const Studio = (() => {
           _gifHasNext = false;
         }
 
-        const urls = data.data.map(item => item.images.original.url);
+        const urls = (data.data || []).map(item => item.images.original.url);
         _renderGridItems(urls, _gifSelectedUrl);
 
         _showPagination(urls.length > 0);
