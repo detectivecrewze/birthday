@@ -417,8 +417,7 @@ const Studio = (() => {
     // ── Pagination state ──────────────────────────────
     let _gifQuery     = '';
     let _gifPage      = 1;
-    let _gifNextPos   = '';          // Tenor "next" cursor for forward
-    let _gifPageStack = [''];        // stack of "pos" values: index = page-1
+    let _gifHasNext   = false;
     let _gifSelectedUrl = '';
 
     const paginationBar = document.getElementById('gif-pagination');
@@ -432,53 +431,58 @@ const Studio = (() => {
     function _updatePageLabel() {
       if (pageLabel) pageLabel.textContent = `Hal. ${_gifPage}`;
       if (btnPrev) btnPrev.disabled = _gifPage <= 1;
-      if (btnNext) btnNext.disabled = !_gifNextPos;
+      if (btnNext) btnNext.disabled = !_gifHasNext;
     }
 
     btnPrev?.addEventListener('click', () => {
       if (_gifPage <= 1) return;
       _gifPage--;
-      const pos = _gifPageStack[_gifPage - 1] || '';
-      _fetchTenor(_gifQuery, pos, false);
+      _fetchGiphy(_gifQuery);
     });
 
     btnNext?.addEventListener('click', () => {
-      if (!_gifNextPos) return;
+      if (!_gifHasNext) return;
       _gifPage++;
-      if (_gifPageStack.length < _gifPage) _gifPageStack.push(_gifNextPos);
-      _fetchTenor(_gifQuery, _gifNextPos, false);
+      _fetchGiphy(_gifQuery);
     });
 
-    async function _fetchTenor(query, pos, resetPage) {
+    async function _fetchGiphy(query) {
       grid.innerHTML = '<p class="gif-picker-empty">Mencari GIF...</p>';
       _showPagination(false);
       try {
-        let url = `https://g.tenor.com/v1/search?q=${encodeURIComponent(query)}&key=LIVDSRZULELA&limit=20`;
-        if (pos) url += `&pos=${encodeURIComponent(pos)}`;
+        const offset = (_gifPage - 1) * 20;
+        const apiKey = 'QtjHpVUgoS3N9iMEH4oy96jVlJMX9AJu';
+        const url = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=20&offset=${offset}`;
+        
         const res  = await fetch(url);
         const data = await res.json();
 
-        _gifNextPos = data.next || '';
-        const urls = data.results.map(item => item.media[0].gif.url);
+        if (data.pagination) {
+          _gifHasNext = data.pagination.total_count > (data.pagination.offset + data.pagination.count);
+        } else {
+          _gifHasNext = false;
+        }
+
+        const urls = data.data.map(item => item.images.original.url);
         _renderGridItems(urls, _gifSelectedUrl);
 
         _showPagination(urls.length > 0);
         _updatePageLabel();
+        
         // Scroll grid back to top on page change
         const scrollBox = grid.closest('[style*="overflow-y"]') || grid.parentElement;
         if (scrollBox) scrollBox.scrollTop = 0;
       } catch (e) {
-        grid.innerHTML = '<p class="gif-picker-empty">Gagal mengambil data dari Tenor. Coba lagi nanti.</p>';
+        grid.innerHTML = '<p class="gif-picker-empty">Gagal mengambil data dari Giphy. Coba lagi nanti.</p>';
       }
     }
 
     async function _searchTenor(query, selectedUrl) {
       _gifQuery      = query;
       _gifPage       = 1;
-      _gifNextPos    = '';
-      _gifPageStack  = [''];
+      _gifHasNext    = false;
       _gifSelectedUrl = selectedUrl;
-      _fetchTenor(query, '', true);
+      _fetchGiphy(query);
     }
 
     function _renderGridItems(urls, selectedUrl) {
