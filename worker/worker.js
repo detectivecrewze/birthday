@@ -216,6 +216,13 @@ var index_default = {
         const existingConfig = existingRaw ? JSON.parse(existingRaw) : {};
         const isPremium = existingConfig.isPremium === true;
 
+        if (body.locale !== undefined && body.locale !== 'id' && body.locale !== 'en') {
+          return new Response(JSON.stringify({ error: 'Invalid locale' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        body.locale = body.locale || existingConfig.locale || 'en';
+
         // Preserve server-controlled flags
         body.isPremium = existingConfig.isPremium ?? false;
 
@@ -328,6 +335,7 @@ var index_default = {
           id: customId,
           studioPassword: studioPassword,
           isPremium: isPremium,
+          locale: 'id',
           template: 'birthday',
           recipientName: '',
           age: '',
@@ -755,6 +763,7 @@ var index_default = {
           id: customId,
           studioPassword: studioPassword,
           isPremium: true, // Bundle links are always premium
+          locale: 'id',
           template: template,
           recipientName: '',
           age: '',

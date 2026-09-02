@@ -102,6 +102,13 @@ const Studio = (() => {
 
   function initPostAuth() {
     const cfg = Auth.getInitialConfig() || {};
+    if (typeof StudioLocale !== 'undefined') {
+      StudioLocale.init(cfg.locale || 'en', (nextLocale) => {
+        cfg.locale = StudioLocale.normalize(nextLocale);
+        StudioLocale.apply(cfg.locale);
+        Autosave.trigger();
+      });
+    }
     _isPremium = cfg.isPremium === true;
 
     // ── Template selection ──

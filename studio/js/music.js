@@ -91,6 +91,10 @@ const Music = (() => {
         }
       });
     }
+
+    if (typeof StudioLocale !== 'undefined' && StudioLocale.apply) {
+      StudioLocale.apply(StudioLocale.get());
+    }
   }
 
   function _getTrackHTML(track, index) {
@@ -185,7 +189,7 @@ const Music = (() => {
     }
 
     el.querySelector('.btn-remove-track')?.addEventListener('click', () => {
-      if (!confirm('Hapus lagu ini dari surat?')) return;
+      if (!confirm((typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Remove this song from the gift?' : 'Hapus lagu ini dari surat?')) return;
       playlist.splice(index, 1);
       if (playlist.length === 0) playlist.push(_createTrack());
       renderAll(); Autosave.trigger();
@@ -206,25 +210,25 @@ const Music = (() => {
     inAudio?.addEventListener('change', async (e) => {
       const f = e.target.files[0];
       if (!f) return;
-      if (f.size > MAX_SIZE) return Studio.showToast('Audio maksimal 30MB.');
-      Studio.showToast('Mengupload lagu... 🎶');
+      if (f.size > MAX_SIZE) return Studio.showToast((typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Audio must be under 30MB.' : 'Audio maksimal 30MB.');
+      Studio.showToast((typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Uploading song... 🎶' : 'Mengupload lagu... 🎶');
       track.uploading = true; renderAll();
       try {
         const url = await _uploadToR2(f);
         track.audio.url = url; track.audio.name = f.name;
         if (!track.title) track.title = f.name.replace(/\.[^/.]+$/, '');
         track.uploading = false; renderAll();
-        Studio.showToast('Lagu berhasil diupload! 🎶'); Autosave.trigger();
+        Studio.showToast((typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Song uploaded successfully! 🎶' : 'Lagu berhasil diupload! 🎶'); Autosave.trigger();
       } catch (err) {
         console.error("[Music Upload Error]", err);
         track.uploading = false; renderAll();
-        Studio.showToast('Gagal upload: ' + err.message);
+        Studio.showToast((typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Upload failed: ' + err.message : 'Gagal upload: ' + err.message);
       }
       inAudio.value = '';
     });
 
     el.querySelector('.btn-remove-audio')?.addEventListener('click', () => {
-      if (!confirm('Hapus audio ini?')) return;
+      if (!confirm((typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Remove this audio?' : 'Hapus audio ini?')) return;
       track.audio.url = null; track.audio.name = null;
       renderAll(); Autosave.trigger();
     });
@@ -292,6 +296,9 @@ const Music = (() => {
       </div>
     </div>`;
     document.body.appendChild(modal);
+    if (typeof StudioLocale !== 'undefined' && StudioLocale.apply) {
+      StudioLocale.apply(StudioLocale.get());
+    }
 
     let selectedSong = null;
     const libAudio = new Audio();

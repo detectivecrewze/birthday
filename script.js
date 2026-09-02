@@ -115,6 +115,49 @@ function applyTemplate(cfg) {
   if (taskbar) taskbar.textContent = tpl.taskbar_label;
 }
 
+function applyGiftLocale(cfg, requestedLocale) {
+  document.querySelector('label[for="gift-language"]')?.remove();
+  document.getElementById('gift-language')?.remove();
+  const locale = RetroI18n.set(requestedLocale, 'en');
+  const setText = (selector, value) => { const el = document.querySelector(selector); if (el) el.textContent = value; };
+  const stage = (number) => RetroI18n.t('stage', { current: number });
+  setText('#start-btn strong', RetroI18n.t('start'));
+  setText('#stage-1 .win-statusbar', stage(1));
+  setText('#stage-2 .win-titlebar-text', `❓ ${RetroI18n.t('question')}`);
+  setText('#stage-2 .win-statusbar', stage(2));
+  setText('#stage-4 .win-statusbar', `${stage(4)} — ${locale === 'id' ? 'Kejutan!' : 'Surprise!'}`);
+  setText('#btn-next-1', RetroI18n.t('next'));
+  setText('#btn-yes', RetroI18n.t('yes'));
+  setText('#btn-no', RetroI18n.t('no'));
+  setText('#btn-memory-prev', RetroI18n.t('prev'));
+  setText('#btn-memory-next', RetroI18n.t('nextMedia'));
+  setText('#stage6-controls + .win-statusbar span:last-child', RetroI18n.t('secret'));
+  setText('#stage-5 .win-statusbar span:last-child', RetroI18n.t('withLove'));
+  setText('#login-dialog-main .win-body > p', RetroI18n.t('passwordProtected'));
+  setText('#login-error-msg', RetroI18n.t('incorrectPassword'));
+  setText('#login-dialog-success .win-body p', RetroI18n.t('passwordCorrect'));
+  setText('#no-dialog .no-text p:first-child strong', RetroI18n.t('accessDenied'));
+  setText('#no-dialog .no-text p:nth-child(2)', RetroI18n.t('wrongAnswer'));
+  setText('#no-dialog .no-text p:nth-child(3)', RetroI18n.t('noEscape'));
+  setText('#btn-no-ok', RetroI18n.t('fine'));
+  const password = document.getElementById('login-password-input');
+  if (password) password.placeholder = RetroI18n.t('passwordPlaceholder');
+  if (locale === 'id') {
+    const template = cfg.template || 'birthday';
+    const stage3 = document.getElementById('stage3-instruction');
+    const stage3Status = document.getElementById('stage3-statusbar');
+    const wishesButton = document.getElementById('stage4-btn-text');
+    const systemCopy = template === 'apology'
+      ? ['ketuk untuk membuka suratmu! 🎁', 'Tahap 3 dari 5 — Buka suratnya!', 'baca suratku']
+      : template === 'general'
+        ? ['ketuk kadonya untuk membukanya! 🎁', 'Tahap 3 dari 5 — Buka kadonya!', 'baca pesanku']
+        : ['ketuk kadonya untuk membuka hadiahmu! 🎁', 'Tahap 3 dari 5 — Klik kadonya!', 'ucapanku'];
+    if (stage3) stage3.textContent = systemCopy[0];
+    if (stage3Status) stage3Status.textContent = systemCopy[1];
+    if (wishesButton) wishesButton.textContent = systemCopy[2];
+  }
+}
+
 /* ═══════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════ */
@@ -170,6 +213,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  applyGiftLocale(cfg, RetroI18n.normalize(cfg.locale, 'en'));
+
   function applyTheme(theme) {
     let color = '#008080';
     if (theme === 'rosepink') color = '#e8a8b8';
@@ -185,6 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Apply template-specific content
   applyTemplate(cfg);
+  applyGiftLocale(cfg, RetroI18n.get());
   window._currentCfg = cfg;
 
   const skipAuth = params.get('skipAuth') === '1';
@@ -212,8 +258,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (noPassword) {
       const titleText = dialogMain.querySelector('.win-titlebar-text');
       const bodyText = dialogMain.querySelector('.win-body p');
-      if (titleText) titleText.textContent = '👋 Welcome';
-      if (bodyText) bodyText.textContent = 'Click OK to open your special gift! 🎁';
+      if (titleText) titleText.textContent = RetroI18n.t('welcome');
+      if (bodyText) bodyText.textContent = RetroI18n.t('welcomeBody');
       if (input) input.style.display = 'none';
       if (hintText) hintText.style.display = 'none';
     }
@@ -278,7 +324,7 @@ function initClock() {
   const el = document.getElementById('taskbar-clock');
   function tick() {
     const now = new Date();
-    el.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    el.textContent = now.toLocaleTimeString(RetroI18n.get() === 'id' ? 'id-ID' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
   }
   tick();
   setInterval(tick, 30000);
@@ -579,7 +625,7 @@ async function initStage5(cfg) {
   const lines = wishes.split('\n').length;
   const cols = wishes.split('\n').pop().length;
   const status = document.getElementById('stage5-status');
-  if (status) status.textContent = `Ln ${lines}, Col ${cols}`;
+  if (status) status.textContent = RetroI18n.t('lineColumn', { lines, columns: cols });
 
   // Show 'secret_photo.exe' button OUTSIDE the Notepad if premium user has media
   const secretMediaList = Array.isArray(cfg.secretMediaList) ? cfg.secretMediaList.filter(m => m && m.url) : [];
@@ -642,7 +688,7 @@ function initStage6(cfg) {
     }
 
     if (captionEl) captionEl.textContent = item.caption || '';
-    if (statusEl) statusEl.textContent = `${idx + 1} of ${mediaList.length}`;
+    if (statusEl) statusEl.textContent = RetroI18n.t('mediaOf', { current: idx + 1, total: mediaList.length });
     if (controlsEl) controlsEl.style.display = mediaList.length > 1 ? 'flex' : 'none';
   }
 
@@ -860,7 +906,7 @@ function initCDPlayer(cfg) {
     
     audio.play().catch(e => {
       console.warn('Autoplay blocked or load failed:', e);
-      if (statusText) statusText.textContent = 'Paused';
+      if (statusText) statusText.textContent = RetroI18n.t('paused');
     });
     
     if (trackEl) trackEl.textContent = `TRACK ${String(idx + 1).padStart(2, '0')} / ${String(playlist.length).padStart(2, '0')}`;
@@ -875,12 +921,12 @@ function initCDPlayer(cfg) {
       coverFallback?.classList.add('paused');
       const toggleBtn = document.getElementById('cd-toggle');
       if (toggleBtn) toggleBtn.textContent = '▶';
-      if (statusText && statusText.textContent !== 'Stopped') statusText.textContent = 'Paused';
+      if (statusText && statusText.textContent !== RetroI18n.t('stopped')) statusText.textContent = RetroI18n.t('paused');
     } else {
       coverFallback?.classList.remove('paused');
       const toggleBtn = document.getElementById('cd-toggle');
       if (toggleBtn) toggleBtn.textContent = '⏸';
-      if (statusText) statusText.textContent = 'Playing';
+      if (statusText) statusText.textContent = RetroI18n.t('playing');
     }
   }
 
@@ -930,7 +976,7 @@ function initCDPlayer(cfg) {
   document.getElementById('cd-stop')?.addEventListener('click', () => {
     audio.pause();
     audio.currentTime = 0;
-    if (statusText) statusText.textContent = 'Stopped';
+    if (statusText) statusText.textContent = RetroI18n.t('stopped');
     if (timeEl) timeEl.textContent = '00:00';
     if (progressFill) progressFill.style.width = '0%';
     if (statusTime) {

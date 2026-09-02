@@ -167,6 +167,9 @@ body {
   white-space: nowrap;
   flex-shrink: 0;
 }
+.studio-language-picker { display:flex; align-items:center; gap:4px; margin-left:auto; font-size:.8rem; white-space:nowrap; }
+.studio-language-picker select { height:25px; max-width:92px; background:#fff; border:1px solid #808080; font:inherit; color:#000; }
+@media (max-width: 520px) { .studio-language-picker > span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); } .studio-language-picker { margin-left:0; } }
 .taskbar-sep {
   width: 2px; height: 24px;
   box-shadow: inset -1px 0 0 #fff, inset 1px 0 0 #808080;

@@ -62,7 +62,7 @@ const Publisher = (() => {
     const submitBtn = document.getElementById('btn-publish');
     const originalText = submitBtn.textContent;
     if (submitBtn) {
-      submitBtn.textContent = 'Mempublish...';
+      submitBtn.textContent = (typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Publishing...' : 'Mempublish...';
       submitBtn.disabled = true;
     }
 
@@ -138,6 +138,10 @@ const Publisher = (() => {
       newBtn.addEventListener('click', _handleDownloadQR);
     }
 
+    if (typeof StudioLocale !== 'undefined' && StudioLocale.apply) {
+      StudioLocale.apply(StudioLocale.get());
+    }
+
     _toggleModal('modal-success', true);
   }
 
@@ -146,12 +150,12 @@ const Publisher = (() => {
     const btn = document.getElementById('btn-download-qr');
 
     if (!exportNode || typeof html2canvas === 'undefined') {
-      Studio.showToast('Fitur download belum siap. Silakan screenshot manual.');
+      Studio.showToast((typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Download feature not ready. Please take a screenshot.' : 'Fitur download belum siap. Silakan screenshot manual.');
       return;
     }
 
     const originalText = btn.innerHTML;
-    btn.innerHTML = 'Menyiapkan...';
+    btn.innerHTML = (typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Preparing...' : 'Menyiapkan...';
     btn.style.opacity = '0.7';
     btn.disabled = true;
 
@@ -172,7 +176,7 @@ const Publisher = (() => {
       document.body.removeChild(link);
     } catch (err) {
       console.error('Error generating QR PNG:', err);
-      Studio.showToast('Gagal mendownload barcode.');
+      Studio.showToast((typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Failed to download barcode.' : 'Gagal mendownload barcode.');
     } finally {
       requestAnimationFrame(() => {
         btn.innerHTML = originalText;
@@ -189,10 +193,10 @@ const Publisher = (() => {
       const btn = document.getElementById('btn-copy-link');
       if (btn) {
         const originalText = btn.textContent;
-        btn.textContent = 'TERSALIN ✓';
+        btn.textContent = (typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'COPIED ✓' : 'TERSALIN ✓';
         setTimeout(() => btn.textContent = originalText, 2000);
       }
-    }).catch(() => Studio.showToast('Gagal salin. Coba manual.'));
+    }).catch(() => Studio.showToast((typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Failed to copy. Try manually.' : 'Gagal salin. Coba manual.'));
   }
   // ── Standalone Request Handler ─────────────────────────────
   async function _handleStandaloneSubmit() {
@@ -202,7 +206,7 @@ const Publisher = (() => {
     error.classList.add('hidden');
 
     if (!domain || domain.length < 3) {
-      error.textContent = 'Domain minimal 3 karakter (huruf kecil, angka, strip).';
+      error.textContent = (typeof StudioLocale !== 'undefined' && StudioLocale.get() === 'en') ? 'Domain must be at least 3 characters (lowercase, numbers, hyphen).' : 'Domain minimal 3 karakter (huruf kecil, angka, strip).';
       error.classList.remove('hidden');
       return;
     }

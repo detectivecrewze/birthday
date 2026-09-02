@@ -58,6 +58,7 @@ const Autosave = (() => {
       studioToken: token,
       giftId: token,
       studioPassword: Auth.getInitialConfig()?.studioPassword || null,
+      locale: (typeof StudioLocale !== 'undefined' && StudioLocale.get) ? StudioLocale.get() : 'id',
 
       // Template
       template: document.querySelector('input[name="template"]:checked')?.value || 'birthday',

@@ -140,6 +140,7 @@ body {
   font-family: var(--font);
   font-size: 1.05rem;
 }
+
 #start-btn {
   display: flex; align-items: center; gap: 4px;
   background: var(--gray);
